@@ -5,7 +5,6 @@ import { pinoHttp } from "pino-http";
 import { env } from "./config/env.js";
 import { logger } from "./logger.js";
 import { healthRouter } from "./routes/health.js";
-import { scansRouter } from "./routes/scans.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 export function createApp() {
@@ -17,7 +16,6 @@ export function createApp() {
   app.use(pinoHttp({ logger, redact: ["req.headers.authorization", "req.headers.cookie"] }));
 
   app.use("/health", healthRouter);
-  app.use("/api/scans", scansRouter);
 
   app.use(errorHandler);
 

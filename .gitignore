@@ -28,6 +28,6 @@ coverage/
 # Vite
 apps/web/dist/
 
-# Temporary LaunchGuard scan data
+# Temporary/scratch data
 .tmp/
 tmp/

@@ -1,5 +1,5 @@
 {
-  "name": "launchguard",
+  "name": "redline",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "dev:api": "pnpm --filter api run dev",
     "build": "pnpm -r --if-present run build",
     "typecheck": "pnpm -r run typecheck",
-    "lint": "eslint apps/api/src packages/shared/src packages/rules/src packages/report/src packages/scanner/src && pnpm --filter web run lint",
+    "lint": "eslint apps/api/src packages/shared/src && pnpm --filter web run lint",
     "test": "pnpm -r --if-present run test"
   },
   "devEngines": {
