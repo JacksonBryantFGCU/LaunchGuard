@@ -1,3 +1,6 @@
-// Redline's shared domain types/schemas will live here.
-// Intentionally empty during the Phase 0 pivot baseline — no speculative modeling.
-export {};
+export * from "./architectureDomain.js";
+export * from "./reviewSubmission.js";
+export * from "./conversationTranscript.js";
+export * from "./voiceSession.js";
+export * from "./stressTestReveal.js";
+export * from "./reviewSession.js";

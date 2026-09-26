@@ -13,6 +13,10 @@
     "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
+    "@clerk/express": "^2.1.72",
+    "@redline/scenarios": "workspace:*",
+    "@redline/shared": "workspace:*",
+    "@supabase/supabase-js": "^2.117.2",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",

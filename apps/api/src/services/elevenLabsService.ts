@@ -10,31 +10,31 @@ export class ElevenLabsProviderError extends Error {
   }
 }
 
-interface CreateSignedConversationUrlInput {
+export interface CreateSignedUrlInput {
   apiKey: string;
   agentId: string;
 }
 
-interface CreateSignedConversationUrlResult {
+interface CreateSignedUrlResult {
   signedUrl: string;
 }
 
 // Talks to ElevenLabs only. Knows nothing about Redline scenarios - it just
-// exchanges an API key + agent ID for a short-lived signed conversation URL,
-// so the API key never has to reach the browser.
-export async function createSignedConversationUrl({
-  apiKey,
-  agentId,
-}: CreateSignedConversationUrlInput): Promise<CreateSignedConversationUrlResult> {
+// exchanges an API key + agent ID for a short-lived signed websocket URL, so
+// the API key never has to reach the browser.
+//
+// Uses the websocket connection type (get-signed-url) rather than the WebRTC
+// conversation-token flow: the websocket connects to this same
+// api.elevenlabs.io host, which is far more likely to pass through
+// restrictive networks (school/campus/corporate firewalls) than WebRTC's
+// dedicated LiveKit media relay (livekit.rtc.elevenlabs.io).
+export async function createSignedUrl({ apiKey, agentId }: CreateSignedUrlInput): Promise<CreateSignedUrlResult> {
   let res: Response;
   try {
-    res = await fetch(
-      `${ELEVENLABS_API_BASE}/v1/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(agentId)}`,
-      {
-        method: "GET",
-        headers: { "xi-api-key": apiKey },
-      },
-    );
+    res = await fetch(`${ELEVENLABS_API_BASE}/v1/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(agentId)}`, {
+      method: "GET",
+      headers: { "xi-api-key": apiKey },
+    });
   } catch (cause) {
     throw new ElevenLabsProviderError("Unable to reach the ElevenLabs API.", cause);
   }
@@ -52,7 +52,7 @@ export async function createSignedConversationUrl({
 
   const signedUrl = (data as { signed_url?: unknown } | null)?.signed_url;
   if (typeof signedUrl !== "string" || signedUrl.length === 0) {
-    throw new ElevenLabsProviderError("ElevenLabs response did not include a signed URL.");
+    throw new ElevenLabsProviderError("ElevenLabs response did not include a signed url.");
   }
 
   return { signedUrl };

@@ -1,21 +1,49 @@
-import express from "express";
+import express, { type RequestHandler } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import { pinoHttp } from "pino-http";
+import { clerkMiddleware } from "@clerk/express";
 import { env } from "./config/env.js";
 import { logger } from "./logger.js";
 import { healthRouter } from "./routes/health.js";
+import { scenariosRouter } from "./routes/scenarios.js";
+import { createReviewsRouter } from "./routes/reviews.js";
+import { createReviewSessionsRouter } from "./routes/reviewSessions.js";
+import { voiceRouter } from "./routes/voice.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { requireAuth as defaultRequireAuth } from "./middleware/auth.js";
+import { createDefaultReviewRepository } from "./db/reviewRepositoryFactory.js";
+import type { ReviewRepository } from "./services/reviewRepository.js";
 
-export function createApp() {
+export interface CreateAppOverrides {
+  // Test-only seam: replaces requireAuth so tests never depend on Clerk's
+  // network/JWKS. Production always uses the real requireAuth.
+  requireAuth?: RequestHandler;
+  // Test-only seam: replaces the review repository so tests never depend on
+  // a live Supabase project. Production always uses createDefaultReviewRepository().
+  repository?: ReviewRepository;
+}
+
+export function createApp(overrides: CreateAppOverrides = {}) {
   const app = express();
+  const requireAuth = overrides.requireAuth ?? defaultRequireAuth;
+  const repository = overrides.repository ?? createDefaultReviewRepository();
 
   app.use(helmet());
   app.use(cors({ origin: env.WEB_ORIGIN }));
   app.use(express.json({ limit: "100kb" }));
   app.use(pinoHttp({ logger, redact: ["req.headers.authorization", "req.headers.cookie"] }));
+  // Only mount the real Clerk middleware when using the real requireAuth -
+  // tests inject a fake requireAuth and never need Clerk's keys/JWKS.
+  if (!overrides.requireAuth) {
+    app.use(clerkMiddleware());
+  }
 
   app.use("/health", healthRouter);
+  app.use("/api/scenarios", scenariosRouter);
+  app.use("/api/review-sessions", requireAuth, createReviewSessionsRouter(repository));
+  app.use("/api/reviews", requireAuth, createReviewsRouter(repository));
+  app.use("/api/voice", requireAuth, voiceRouter);
 
   app.use(errorHandler);
 
