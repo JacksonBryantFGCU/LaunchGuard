@@ -7,3 +7,14 @@
 body {
   margin: 0;
 }
+
+.redline-commented-line {
+  background-color: rgba(56, 189, 248, 0.12);
+}
+
+.redline-commented-line-gutter::before {
+  content: "\25CF";
+  color: rgb(56, 189, 248);
+  font-size: 10px;
+  padding-left: 4px;
+}
