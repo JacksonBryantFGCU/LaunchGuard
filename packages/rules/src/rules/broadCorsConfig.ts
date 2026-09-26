@@ -3,21 +3,22 @@ import type { Rule } from "../engine.js";
 export const broadCorsConfig: Rule = {
   id: "broad-cors-config",
   name: "Suspiciously broad CORS configuration",
-  description: "Checks that the project does not allow all origins via CORS.",
+  description: "Checks for a literal wildcard CORS origin in a common server entrypoint file.",
   category: "security",
   defaultSeverity: "high",
-  evaluate(context) {
-    const origins = context.project.corsOrigins;
-    if (!origins || !origins.includes("*")) return null;
+  evaluate({ analysis }) {
+    const files = analysis.signals.corsWildcardFiles;
+    if (files.length === 0) return null;
+
     return {
       ruleId: this.id,
-      title: "CORS allows all origins",
+      title: "CORS appears to allow all origins",
       severity: this.defaultSeverity,
       category: this.category,
       explanation:
-        "The project's CORS configuration includes a wildcard origin (\"*\"), which allows any website to make authenticated requests against the API.",
+        "A wildcard CORS origin (or a bare cors() call with no origin restriction) was found in a server entrypoint, which allows any website to make requests against the API.",
       remediation: "Restrict CORS to an explicit allowlist of trusted origins instead of using a wildcard.",
-      evidence: [{ description: "project.corsOrigins includes \"*\"" }],
+      evidence: files.map((file) => ({ description: "Wildcard CORS pattern found in this file.", file })),
     };
   },
 };

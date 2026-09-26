@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { Finding } from "@launchguard/shared";
+import type { Finding, RepositoryAnalysis } from "@launchguard/shared";
 import { summarize, buildScanResult } from "./index.js";
 
 function finding(overrides: Partial<Finding> = {}): Finding {
@@ -12,6 +12,21 @@ function finding(overrides: Partial<Finding> = {}): Finding {
     explanation: "e",
     remediation: "m",
     evidence: [],
+    ...overrides,
+  };
+}
+
+function analysis(overrides: Partial<RepositoryAnalysis> = {}): RepositoryAnalysis {
+  return {
+    repository: { owner: "acme", name: "widget", url: "https://github.com/acme/widget" },
+    project: { languages: [], frameworks: [], packageManager: "unknown", isNodeProject: false },
+    files: [],
+    manifest: undefined,
+    configuration: [],
+    potentialSecrets: [],
+    signals: { corsWildcardFiles: [] },
+    statistics: { filesSeen: 3, filesAnalyzed: 3, truncated: false },
+    warnings: [],
     ...overrides,
   };
 }
@@ -38,10 +53,12 @@ test("summarize returns zeroed counts for no findings", () => {
   assert.equal(summary.bySeverity.info, 0);
 });
 
-test("buildScanResult attaches project name, timestamp, and summary", () => {
-  const result = buildScanResult("demo", [finding()]);
-  assert.equal(result.projectName, "demo");
+test("buildScanResult carries repository identity, statistics, and warnings from the analysis", () => {
+  const result = buildScanResult(analysis({ warnings: [{ code: "inventory-truncated", message: "x" }] }), [finding()]);
+  assert.equal(result.repository.name, "widget");
   assert.equal(result.findings.length, 1);
   assert.equal(result.summary.totalFindings, 1);
+  assert.equal(result.statistics.filesSeen, 3);
+  assert.equal(result.warnings.length, 1);
   assert.ok(!Number.isNaN(Date.parse(result.scannedAt)));
 });

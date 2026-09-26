@@ -1,30 +1,31 @@
-import type { ScanRequest, ScanResult } from "@launchguard/shared";
+import type { ScanResult } from "@launchguard/shared";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
-/** Phase 1 has no repository input yet, so we analyze a built-in sample project. */
-export const sampleScanRequest: ScanRequest = {
-  project: {
-    name: "sample-web-service",
-    hasEnvExample: false,
-    hasBuildScript: true,
-    hasStartScript: true,
-    hasHealthCheck: false,
-    corsOrigins: ["*"],
-  },
-};
+export class ScanRequestError extends Error {
+  code: string;
 
-export async function analyzeProject(request: ScanRequest): Promise<ScanResult> {
-  const res = await fetch(`${API_URL}/api/scans/analyze`, {
+  constructor(code: string, message: string) {
+    super(message);
+    this.name = "ScanRequestError";
+    this.code = code;
+  }
+}
+
+export async function scanRepository(repositoryUrl: string): Promise<ScanResult> {
+  const res = await fetch(`${API_URL}/api/scans`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(request),
+    body: JSON.stringify({ repositoryUrl }),
   });
 
+  const body = await res.json().catch(() => null);
+
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.message ?? `Scan failed with status ${res.status}`);
+    const code = body?.error ?? "REPOSITORY_SCAN_FAILED";
+    const message = body?.message ?? "The scan could not be completed.";
+    throw new ScanRequestError(code, message);
   }
 
-  return res.json();
+  return body as ScanResult;
 }

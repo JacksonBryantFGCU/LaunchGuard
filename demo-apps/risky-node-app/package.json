@@ -1,0 +1,10 @@
+{
+  "name": "risky-node-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^5.0.0"
+  }
+}
