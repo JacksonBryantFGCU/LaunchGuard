@@ -6,7 +6,7 @@ export function NotFoundPage() {
       <h1 className="text-xl font-semibold text-slate-100">Page not found</h1>
       <p className="text-sm text-slate-400">The page you're looking for doesn't exist.</p>
       <Link to="/" className="text-sm font-medium text-slate-100 underline underline-offset-4">
-        Back to Scenario Library
+        Back home
       </Link>
     </main>
   );

@@ -13,8 +13,6 @@
     "test": "tsx --test src/**/*.test.ts"
   },
   "dependencies": {
-    "@redline/scenarios": "workspace:*",
-    "@redline/shared": "workspace:*",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",

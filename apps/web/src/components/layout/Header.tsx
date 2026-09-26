@@ -7,11 +7,7 @@ export function Header() {
         <Link to="/" className="text-sm font-semibold tracking-tight text-slate-100">
           Redline
         </Link>
-        <nav aria-label="Primary" className="text-sm">
-          <Link to="/" className="text-slate-400 hover:text-slate-100">
-            Scenarios
-          </Link>
-        </nav>
+        <p className="text-sm text-slate-500">Architecture Review Simulator</p>
       </div>
     </header>
   );
