@@ -9,7 +9,7 @@ export type { InternalArchitectureScenario } from "./internalScenario.js";
 export { toPublicStressTests } from "./internalScenario.js";
 export type { InternalPracticeScenario } from "./internalPracticeScenario.js";
 export { getInternalPracticeScenarioById } from "./internalPracticeScenarioRegistry.js";
-export { evaluateScenarioResponse } from "./scenarioEvaluator.js";
+export { evaluateScenarioResponse, evaluateResilience, combineScenarioEvaluation } from "./scenarioEvaluator.js";
 export { isValidPlacement } from "./stressLab/compatibility.js";
 
 // Interactive Architecture Stress Lab (spec: Live Stress Simulation Engine).

@@ -281,6 +281,11 @@ function fakeResultData(overrides: Partial<ScenarioEvaluationResult> = {}): Scen
     submittedSeverity: "low",
     expectedSeverity: "high",
     severityAligned: false,
+    resilienceScore: 0,
+    maxResilienceScore: 0,
+    resilienceTestResults: [],
+    totalScore: 10,
+    maxTotalScore: 16,
     ...overrides,
   };
 }

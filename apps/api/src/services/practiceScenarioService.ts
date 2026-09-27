@@ -7,7 +7,13 @@ import {
   type AddPracticeEvidenceRequest,
 } from "@redline/shared";
 import { getPracticeScenarioById } from "@redline/scenarios";
-import { getInternalPracticeScenarioById, evaluateScenarioResponse } from "@redline/scenarios/internal";
+import {
+  getInternalPracticeScenarioById,
+  evaluateScenarioResponse,
+  evaluateResilience,
+  combineScenarioEvaluation,
+  getStressLabDefinition,
+} from "@redline/scenarios/internal";
 import type { ReviewRepository } from "./reviewRepository.js";
 import { requireOwnedSession } from "./reviewSessionService.js";
 import {
@@ -116,7 +122,16 @@ export async function submitPracticeScenarioResponse(
   }
 
   const submitted = await practiceRepo.submitPracticeScenarioResponse(attempt.id);
-  const evaluation = evaluateScenarioResponse(parsed.data, internalScenario);
+  const written = evaluateScenarioResponse(parsed.data, internalScenario);
+
+  // Resilience is scored from whatever Stress Lab runs already exist for
+  // this attempt at submit time - the learner is expected to have run (and
+  // ideally passed) the scenario's tests during investigation, not after.
+  const stressLab = getStressLabDefinition(practiceScenarioId);
+  const runs = await practiceRepo.listStressSimulationRuns(attempt.id);
+  const resilience = evaluateResilience(stressLab?.testDefinitions ?? [], runs);
+  const evaluation = combineScenarioEvaluation(written, resilience);
+
   await practiceRepo.savePracticeScenarioResult(attempt.id, {
     objectiveScore: evaluation.objectiveScore,
     objectiveMaxScore: evaluation.maxObjectiveScore,
@@ -341,6 +356,11 @@ export async function completePracticeScenarioAttempt(
   // Best-effort: an attempt can reach completed without a result in
   // principle (shouldn't normally happen), so this just skips recording
   // rather than failing the completion.
+  //
+  // The leaderboard ranks on totalScore (written response + resilience),
+  // not the written response alone - result.objectiveScore/objectiveMaxScore
+  // (the stored columns) stay written-response-only for that page's own
+  // breakdown; result.resultData carries the combined totals.
   const result = await practiceRepo.getPracticeScenarioResult(owned.attempt.id);
   if (result) {
     await recordScenarioCompletion(
@@ -348,8 +368,8 @@ export async function completePracticeScenarioAttempt(
       userId,
       practiceScenarioId,
       owned.attempt.id,
-      result.objectiveScore,
-      result.objectiveMaxScore,
+      result.resultData.totalScore,
+      result.resultData.maxTotalScore,
     );
   }
 

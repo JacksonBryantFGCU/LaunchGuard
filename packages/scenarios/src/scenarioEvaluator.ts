@@ -1,4 +1,12 @@
-import type { ScenarioResponse, ConceptCheck, ScenarioEvaluationResult } from "@redline/shared";
+import type {
+  ScenarioResponse,
+  ConceptCheck,
+  WrittenResponseEvaluation,
+  ResilienceEvaluation,
+  ScenarioEvaluationResult,
+  StressParameterValues,
+  StressProfile,
+} from "@redline/shared";
 import type { ConceptGroup, InternalPracticeScenario } from "./internalPracticeScenario.js";
 
 // Deterministic objective evaluation only (no LLM grading). Concept
@@ -35,7 +43,7 @@ function scoreFraction(checks: ConceptCheck[], points: number): number {
 export function evaluateScenarioResponse(
   response: ScenarioResponse,
   scenario: InternalPracticeScenario,
-): ScenarioEvaluationResult {
+): WrittenResponseEvaluation {
   const diagnosisConcepts = checkConcepts(
     `${response.diagnosis} ${response.investigationPlan}`,
     scenario.expectedConcepts,
@@ -81,5 +89,59 @@ export function evaluateScenarioResponse(
     submittedSeverity: response.severity,
     expectedSeverity: scenario.severityTruth,
     severityAligned: response.severity === scenario.severityTruth,
+  };
+}
+
+const MAX_RESILIENCE_SCORE = 8;
+
+interface StressRunOutcome {
+  testId: string;
+  parameters: StressParameterValues;
+  passed: boolean;
+}
+
+function ranAtDefaultParameters(profile: StressProfile, parameters: StressParameterValues): boolean {
+  return profile.parameters.every((p) => (parameters[p.id] ?? p.defaultValue) === p.defaultValue);
+}
+
+/**
+ * Resilience component of the total score: one point share per stress test
+ * the scenario offers (spec: "pass at the scenario's authored default
+ * load"). A test counts only once it has a PASSED run at its own default
+ * parameters - a passing run reached by weakening the test (less traffic,
+ * a shorter failure window, ...) doesn't earn credit, even though the run
+ * itself still shows up in Stress Lab run history. `testDefinitions: []`
+ * (a scenario with no Stress Lab) returns 0/0, never lowering that
+ * scenario's max score.
+ */
+export function evaluateResilience(testDefinitions: StressProfile[], runs: StressRunOutcome[]): ResilienceEvaluation {
+  if (testDefinitions.length === 0) {
+    return { resilienceScore: 0, maxResilienceScore: 0, resilienceTestResults: [] };
+  }
+
+  const resilienceTestResults = testDefinitions.map((profile) => ({
+    testId: profile.id,
+    label: profile.label,
+    passedAtDefaultParameters: runs.some(
+      (run) => run.testId === profile.id && run.passed && ranAtDefaultParameters(profile, run.parameters),
+    ),
+  }));
+
+  const passedCount = resilienceTestResults.filter((r) => r.passedAtDefaultParameters).length;
+  const resilienceScore = Math.round(MAX_RESILIENCE_SCORE * (passedCount / testDefinitions.length));
+
+  return { resilienceScore, maxResilienceScore: MAX_RESILIENCE_SCORE, resilienceTestResults };
+}
+
+/** Combines both halves into the full result once both are known - the only place totalScore/maxTotalScore are computed. */
+export function combineScenarioEvaluation(
+  written: WrittenResponseEvaluation,
+  resilience: ResilienceEvaluation,
+): ScenarioEvaluationResult {
+  return {
+    ...written,
+    ...resilience,
+    totalScore: written.objectiveScore + resilience.resilienceScore,
+    maxTotalScore: written.maxObjectiveScore + resilience.maxResilienceScore,
   };
 }

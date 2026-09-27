@@ -64,6 +64,11 @@ function validEvaluationResult(overrides: Record<string, unknown> = {}) {
     submittedSeverity: "high",
     expectedSeverity: "high",
     severityAligned: true,
+    resilienceScore: 8,
+    maxResilienceScore: 8,
+    resilienceTestResults: [{ testId: "sustained-load", label: "Sustained Load", passedAtDefaultParameters: true }],
+    totalScore: 24,
+    maxTotalScore: 24,
     ...overrides,
   };
 }

@@ -1,7 +1,8 @@
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import type { ConceptCheck } from "@redline/shared";
 import { usePracticeAttempt } from "../features/practice-scenarios/practiceAttemptStore.js";
 import { canOpenConsequence, canOpenResult } from "../features/practice-scenarios/practiceWorkflow.js";
+import { buildMockAttemptView, type MockResultPreset } from "../features/practice-scenarios/devMockResult.js";
 import type { PracticeScenarioOutletContext } from "./PracticeScenarioLayout.js";
 
 function ConceptList({ title, tone, checks }: { title: string; tone: "success" | "warning"; checks: ConceptCheck[] }) {
@@ -25,13 +26,34 @@ function ConceptList({ title, tone, checks }: { title: string; tone: "success" |
 
 export function PracticeResultPage() {
   const { system, practiceScenario } = useOutletContext<PracticeScenarioOutletContext>();
-  const { view, markConsequenceReady } = usePracticeAttempt();
+  const { view: liveView, markConsequenceReady, complete } = usePracticeAttempt();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Dev-only shortcut (?mock=pass|fail): preview this page's full layout
+  // without running through investigation -> Stress Lab -> submission each
+  // time. Never reachable in production - import.meta.env.DEV is false in
+  // a built app, so this branch is inert there even if someone appends the
+  // param by hand.
+  const mockPreset = import.meta.env.DEV ? (searchParams.get("mock") as MockResultPreset | null) : null;
+  const view = mockPreset ? buildMockAttemptView(practiceScenario.id, liveView.reviewSessionId, mockPreset) : liveView;
 
   if (!canOpenResult(view.status) || !view.result) {
     return (
       <main className="mx-auto max-w-2xl px-6 py-10">
         <p className="text-sm text-slate-400">Submit your response to see the result for this scenario.</p>
+        {import.meta.env.DEV && (
+          <p className="mt-4 text-xs text-slate-600">
+            Dev preview:{" "}
+            <Link to="?mock=pass" className="underline">
+              pass
+            </Link>{" "}
+            ·{" "}
+            <Link to="?mock=fail" className="underline">
+              fail
+            </Link>
+          </p>
+        )}
       </main>
     );
   }
@@ -43,12 +65,16 @@ export function PracticeResultPage() {
 
   const requirementLabel = (id: string) => system.requirements.find((r) => r.id === id)?.summary ?? id;
 
-  async function handleSeeConsequence() {
+  // The "what happens" consequence already played out during investigation
+  // (Stress Lab, scored above) rather than as a separate narrative reveal
+  // after the fact - finishing here just records the attempt as done.
+  // consequence_ready is still a required stop in the server's status state
+  // machine (feedback_ready -> consequence_ready -> completed), so it's
+  // still called, just without a page of its own for practice scenarios.
+  async function handleFinish() {
     if (view.status === "feedback_ready") await markConsequenceReady();
-    navigate(
-      `/app/review/${system.slug}/stress-tests?reviewId=${encodeURIComponent(view.reviewSessionId)}` +
-        `&practiceScenarioId=${encodeURIComponent(practiceScenario.id)}&title=${encodeURIComponent(practiceScenario.title)}`,
-    );
+    await complete();
+    navigate(`/app/practice/${system.slug}`);
   }
 
   return (
@@ -78,11 +104,16 @@ export function PracticeResultPage() {
         </dl>
       </section>
 
-      <section className="mt-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Objective Score</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-100">
-          {result.objectiveScore} / {result.maxObjectiveScore}
+      <section className="mt-6 rounded-lg border border-slate-800 bg-slate-900 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Total Score</p>
+        <p className="mt-1 text-3xl font-semibold text-slate-100">
+          {result.totalScore} / {result.maxTotalScore}
         </p>
+        <p className="mt-1 text-xs text-slate-500">Written response + system resilience under load.</p>
+      </section>
+
+      <section className="mt-6">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Written Response ({result.objectiveScore} / {result.maxObjectiveScore})</p>
         <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
           <div className="rounded-md border border-slate-800 bg-slate-900 p-2.5">
             <dt className="text-xs text-slate-500">Diagnosis</dt>
@@ -102,6 +133,33 @@ export function PracticeResultPage() {
           </div>
         </dl>
       </section>
+
+      {/* Absent (maxResilienceScore 0) for a scenario with no Stress Lab - never shown as "0/0", which would read as a failure. */}
+      {result.maxResilienceScore > 0 && (
+        <section className="mt-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            System Resilience ({result.resilienceScore} / {result.maxResilienceScore})
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Credit for each Stress Lab test passed at its default load before submitting - a run made easier by weakening the test doesn't count.
+          </p>
+          <ul className="mt-3 flex flex-col gap-2">
+            {result.resilienceTestResults.map((test) => (
+              <li
+                key={test.testId}
+                className={`flex items-center justify-between rounded-md border p-2.5 text-sm ${
+                  test.passedAtDefaultParameters ? "border-emerald-900 bg-emerald-950/20" : "border-slate-800 bg-slate-900"
+                }`}
+              >
+                <span className="text-slate-200">{test.label}</span>
+                <span className={test.passedAtDefaultParameters ? "text-emerald-400" : "text-amber-400"}>
+                  {test.passedAtDefaultParameters ? "✓ Passed" : "✕ Not passed"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-6 flex flex-col gap-4">
         <ConceptList title="What You Did Well" tone="success" checks={strong} />
@@ -130,14 +188,25 @@ export function PracticeResultPage() {
         </p>
       )}
 
-      {canOpenConsequence(view.status) && (
-        <button
-          type="button"
-          onClick={handleSeeConsequence}
-          className="mt-8 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500"
-        >
-          See What Happens
-        </button>
+      {mockPreset ? (
+        <p className="mt-8 text-xs text-slate-600">Dev preview ({mockPreset}) - not a real attempt, nothing is saved.</p>
+      ) : view.status === "completed" ? (
+        <p className="mt-8 text-sm text-slate-400">
+          Scenario completed - this score is recorded.{" "}
+          <Link to={`/app/practice/${system.slug}`} className="underline underline-offset-4">
+            Back to scenario list
+          </Link>
+        </p>
+      ) : (
+        canOpenConsequence(view.status) && (
+          <button
+            type="button"
+            onClick={handleFinish}
+            className="mt-8 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500"
+          >
+            Finish Scenario
+          </button>
+        )
       )}
     </main>
   );

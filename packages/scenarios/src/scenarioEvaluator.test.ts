@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { ScenarioResponse } from "@redline/shared";
-import { evaluateScenarioResponse } from "./scenarioEvaluator.js";
+import type { ScenarioResponse, StressProfile } from "@redline/shared";
+import { evaluateScenarioResponse, evaluateResilience, combineScenarioEvaluation } from "./scenarioEvaluator.js";
 import { InternalPracticeScenarioSchema } from "./internalPracticeScenario.js";
 
 const scenario = InternalPracticeScenarioSchema.parse({
@@ -136,4 +136,93 @@ test("concept checks report every concept, matched and missed", () => {
   assert.equal(result.diagnosisConcepts.length, 1);
   assert.equal(result.diagnosisConcepts[0].matched, true);
   assert.equal(result.immediateActionConcepts[0].matched, false);
+});
+
+// --- resilience scoring --------------------------------------------------
+
+const loadProfile: StressProfile = {
+  id: "sustained-load",
+  scenarioId: "payment-provider-degradation",
+  label: "Sustained Load",
+  description: "Holds traffic steady.",
+  category: "load",
+  durationSeconds: 300,
+  stepSeconds: 30,
+  parameters: [{ id: "requestsPerMinute", label: "Traffic", description: "Checkout requests per minute.", type: "number", unit: "req/min", defaultValue: 800, editable: true }],
+};
+
+const spikeProfile: StressProfile = {
+  ...loadProfile,
+  id: "traffic-spike",
+  label: "Traffic Spike",
+  category: "spike",
+};
+
+test("a scenario with no Stress Lab scores 0/0 resilience, never lowering the max", () => {
+  const result = evaluateResilience([], []);
+  assert.equal(result.resilienceScore, 0);
+  assert.equal(result.maxResilienceScore, 0);
+  assert.deepEqual(result.resilienceTestResults, []);
+});
+
+test("passing the only test at its default parameters earns full resilience credit", () => {
+  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true }]);
+  assert.equal(result.resilienceScore, 8);
+  assert.equal(result.resilienceTestResults[0]?.passedAtDefaultParameters, true);
+});
+
+test("a run with an omitted parameter still counts as default (the engine fills it in the same way)", () => {
+  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: {}, passed: true }]);
+  assert.equal(result.resilienceScore, 8);
+});
+
+test("passing only after weakening the test's parameters earns no credit", () => {
+  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 100 }, passed: true }]);
+  assert.equal(result.resilienceScore, 0);
+  assert.equal(result.resilienceTestResults[0]?.passedAtDefaultParameters, false);
+});
+
+test("a failed run at default parameters earns no credit", () => {
+  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: false }]);
+  assert.equal(result.resilienceScore, 0);
+});
+
+test("resilience score is a fair share across every test the scenario offers", () => {
+  const result = evaluateResilience(
+    [loadProfile, spikeProfile],
+    [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true }],
+  );
+  assert.equal(result.resilienceScore, 4);
+  assert.equal(result.resilienceTestResults.find((r) => r.testId === "sustained-load")?.passedAtDefaultParameters, true);
+  assert.equal(result.resilienceTestResults.find((r) => r.testId === "traffic-spike")?.passedAtDefaultParameters, false);
+});
+
+test("only the most recent-looking passing run matters, not a mix of a weak pass and a strong pass - any qualifying run is enough", () => {
+  const result = evaluateResilience(
+    [loadProfile],
+    [
+      { testId: "sustained-load", parameters: { requestsPerMinute: 100 }, passed: true },
+      { testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true },
+    ],
+  );
+  assert.equal(result.resilienceScore, 8);
+});
+
+test("combineScenarioEvaluation sums both halves into totalScore/maxTotalScore", () => {
+  const written = evaluateScenarioResponse(
+    baseResponse({
+      diagnosis: "Checkout waits synchronously on the payment provider.",
+      immediateAction: "Add a bounded timeout so we fail fast instead of blocking.",
+      architectureDecision: "Wrap the payment call in a circuit breaker.",
+      affectedRequirementIds: ["req-latency", "req-availability"],
+      evidenceIds: ["ev-payment-p99"],
+    }),
+    scenario,
+  );
+  const resilience = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true }]);
+  const combined = combineScenarioEvaluation(written, resilience);
+  assert.equal(combined.totalScore, 16 + 8);
+  assert.equal(combined.maxTotalScore, 16 + 8);
+  assert.equal(combined.objectiveScore, 16);
+  assert.equal(combined.resilienceScore, 8);
 });
