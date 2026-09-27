@@ -1,0 +1,9 @@
+{
+  "buildCommand": "pnpm --filter web run build",
+  "outputDirectory": "apps/web/dist",
+  "rewrites": [
+    { "source": "/health", "destination": "/api" },
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api/|health).*)", "destination": "/index.html" }
+  ]
+}
