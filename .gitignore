@@ -31,3 +31,5 @@ apps/web/dist/
 # Temporary/scratch data
 .tmp/
 tmp/
+.vercel
+.env*
