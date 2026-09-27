@@ -6,4 +6,30 @@
 
 body {
   margin: 0;
+  scrollbar-color: #334155 #0f172a;
+}
+
+/* Applied to the app's internally-scrolling panels (Stress Lab rails, drawers, etc.) so long lists never fall back to the browser's default light scrollbar against a dark UI. */
+.scroll-panel {
+  scrollbar-color: #334155 #0f172a;
+  scrollbar-width: thin;
+}
+
+.scroll-panel::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-panel::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.scroll-panel::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  border-radius: 9999px;
+  border: 2px solid #0f172a;
+}
+
+.scroll-panel::-webkit-scrollbar-thumb:hover {
+  background-color: #0ea5e9;
 }

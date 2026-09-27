@@ -18,7 +18,7 @@ export function TestSelector({
   onSelect: (testId: string) => void;
 }) {
   return (
-    <div role="tablist" aria-label="Stress tests" className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
+    <div role="tablist" aria-label="Stress tests" className="flex flex-col gap-2">
       {tests.map((test) => {
         const selected = test.id === selectedTestId;
         return (

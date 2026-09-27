@@ -8,14 +8,14 @@ import { RequirementsPanel } from "./components/RequirementsPanel.js";
 import { BottleneckPanel } from "./components/BottleneckPanel.js";
 import { TimelineControls } from "./components/TimelineControls.js";
 import { RunHistoryPanel } from "./components/RunHistoryPanel.js";
-import { ComparisonPanel } from "./components/ComparisonPanel.js";
 import { InterventionEditorPanel } from "./components/InterventionEditorPanel.js";
 import { RuntimeNodeInspector, RuntimeEdgeInspector } from "./components/RuntimeInspector.js";
 import { mapFrameToNodeStates, mapFrameToEdgeStates, mapFrameToNodeMetrics } from "./runtimeMapping.js";
 import { countRequirementStatuses, formatRequirementScore, primaryBottleneck, correlateRequirementBottleneck } from "./resultSummary.js";
 import { framesToChartSeries, nearestFrameIndexForTime, flattenEvents, selectPrimaryChartKeys } from "./chartData.js";
-import { TimeSeriesChart } from "./components/TimeSeriesChart.js";
-import { EventTimelinePanel } from "./components/EventTimelinePanel.js";
+import { AnalysisDrawer } from "./components/AnalysisDrawer.js";
+import { deriveLabMode } from "./labMode.js";
+import { selectLiveMetricKeys } from "./liveMetricSelection.js";
 import type { StressLabTabState } from "./useStressLabTabState.js";
 import type { StressLabVoiceFocus } from "../voice/architectContext.js";
 import { buildStressLabVoiceContext } from "../voice/architectContext.js";
@@ -24,13 +24,6 @@ export interface ArchitectFocusRequest {
   focusLabel: string;
   context: StressLabVoiceFocus;
   bottleneck?: { metric: string; targetId: string };
-}
-
-const CHART_COLORS = ["#38bdf8", "#f59e0b", "#f97316"];
-
-function formatMetricLabel(key: string): string {
-  const withSpaces = key.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
-  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
 }
 
 function AskAlexButton({ label, onClick }: { label: string; onClick: () => void }) {
@@ -67,6 +60,8 @@ export function StressLabTab({
 }) {
   const { lab, selection, selectNode, selectEdge, clearSelection, view, setView, speed, setSpeed, playback } = state;
   const [conditionsExpanded, setConditionsExpanded] = useState(false);
+  const mode = deriveLabMode(!!lab.activeResult, playback);
+  const liveMetricKeys = lab.selectedTest ? selectLiveMetricKeys(lab.selectedTest.category) : undefined;
 
   const nodeIds = system.nodes.map((n) => n.id);
   const edgeIds = system.edges.map((e) => e.id);
@@ -194,7 +189,7 @@ export function StressLabTab({
             Back to Stress Lab
           </button>
         </div>
-        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto lg:grid-cols-[7fr_3fr]">
+        <div className="scroll-panel grid min-h-0 flex-1 grid-cols-1 overflow-y-auto lg:grid-cols-[7fr_3fr]">
           <InterventionEditorPanel
             interventions={lab.interventions}
             nodes={system.nodes}
@@ -229,48 +224,52 @@ export function StressLabTab({
       </div>
 
       {!lab.activeResult ? (
-        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 overflow-y-auto px-6 py-8">
-          <div>
-            <h1 className="text-xl font-semibold text-slate-100">Test the Architecture</h1>
-            <ol className="mt-2 list-decimal pl-5 text-sm text-slate-400">
-              <li>Choose a test</li>
-              <li>Configure the conditions</li>
-              <li>Run the baseline</li>
-            </ol>
+        <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[280px_1fr]">
+          {/* Test choice lives in its own narrow rail (spec: horizontal layout, not one long stacked column) so picking a test never requires scrolling past the conditions form. */}
+          <div className="scroll-panel flex flex-col gap-4 overflow-y-auto border-b border-slate-800 p-6 lg:border-b-0 lg:border-r">
+            <div>
+              <h1 className="text-xl font-semibold text-slate-100">Test the Architecture</h1>
+              <ol className="mt-2 list-decimal pl-5 text-sm text-slate-400">
+                <li>Choose a test</li>
+                <li>Configure the conditions</li>
+                <li>Run the baseline</li>
+              </ol>
+            </div>
+            <TestSelector tests={lab.testDefinitions} selectedTestId={lab.selectedTest?.id} onSelect={lab.selectTest} />
           </div>
 
-          <TestSelector tests={lab.testDefinitions} selectedTestId={lab.selectedTest?.id} onSelect={lab.selectTest} />
+          <div className="scroll-panel flex flex-col gap-6 overflow-y-auto p-6">
+            {lab.selectedTest && (
+              <ParameterForm
+                profile={lab.selectedTest}
+                values={lab.parameterValues}
+                onChange={lab.setParameter}
+                onReset={lab.resetParameters}
+                error={lab.parameterError}
+                isCustom={isCustomParams}
+              />
+            )}
 
-          {lab.selectedTest && (
-            <ParameterForm
-              profile={lab.selectedTest}
-              values={lab.parameterValues}
-              onChange={lab.setParameter}
-              onReset={lab.resetParameters}
-              error={lab.parameterError}
-              isCustom={isCustomParams}
-            />
-          )}
+            {lab.runRequestStatus.status === "error" && (
+              <p role="alert" className="text-xs text-red-400">
+                {lab.runRequestStatus.message}{" "}
+                <button type="button" onClick={lab.runTest} className="underline">
+                  Try Again
+                </button>
+              </p>
+            )}
 
-          {lab.runRequestStatus.status === "error" && (
-            <p role="alert" className="text-xs text-red-400">
-              {lab.runRequestStatus.message}{" "}
-              <button type="button" onClick={lab.runTest} className="underline">
-                Try Again
-              </button>
-            </p>
-          )}
+            <button
+              type="button"
+              onClick={lab.runTest}
+              disabled={lab.runRequestStatus.status === "submitting"}
+              className="self-start rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-60"
+            >
+              {lab.runRequestStatus.status === "submitting" ? "Running…" : hasRunSelectedTest ? "Re-run Test" : "Run Baseline Test"}
+            </button>
 
-          <button
-            type="button"
-            onClick={lab.runTest}
-            disabled={lab.runRequestStatus.status === "submitting"}
-            className="self-start rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 disabled:opacity-60"
-          >
-            {lab.runRequestStatus.status === "submitting" ? "Running…" : hasRunSelectedTest ? "Re-run Test" : "Run Baseline Test"}
-          </button>
-
-          <RunHistoryPanel runs={lab.runsForSelectedTest} activeRunId={undefined} onSelect={() => {}} />
+            {lab.runsForSelectedTest.length > 0 && <RunHistoryPanel runs={lab.runsForSelectedTest} activeRunId={undefined} onSelect={() => {}} />}
+          </div>
         </div>
       ) : (
         <>
@@ -306,8 +305,38 @@ export function StressLabTab({
             )}
           </div>
 
+          {/* Playback controls live in one consistent place (spec #17) rather than scattered across the page. */}
+          <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-2">
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                playback.status === "playing" ? "bg-emerald-950 text-emerald-300" : "bg-slate-800 text-slate-300"
+              }`}
+            >
+              {playback.status === "playing" ? "Running" : "Paused"}
+            </span>
+            <TimelineControls
+              frames={lab.activeResult.frames}
+              playback={playback}
+              speed={speed}
+              onSpeedChange={setSpeed}
+              onPlay={state.onPlay}
+              onPause={state.onPause}
+              onNext={state.onNext}
+              onPrevious={state.onPrevious}
+              onRestart={state.onRestart}
+              onScrub={state.onScrub}
+            />
+          </div>
+
+          {/* Result summary sits at the top once a run completes (spec #19/#20) - not buried below the canvas. */}
+          {mode === "analyze" && (
+            <div className="px-4 pt-4">
+              <RunCompletionSummary passed={lab.activeResult.passed} requirements={lab.activeResult.requirementResults} bottlenecks={lab.activeResult.bottlenecks} onModify={() => setView("modify")} onRerun={lab.runTest} />
+            </div>
+          )}
+
           <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[7fr_3fr]">
-            <div className="min-h-[420px]">
+            <div className="min-h-[560px]">
               <ArchitectureCanvas
                 nodes={system.nodes}
                 edges={system.edges}
@@ -326,11 +355,11 @@ export function StressLabTab({
               />
             </div>
             {/* During an active run, the sidebar is only Live System / Requirements / Primary Bottleneck (spec #5) - no generic filler copy. */}
-            <div className="flex flex-col gap-4 overflow-y-auto border-l border-slate-800 p-4">
+            <div className="scroll-panel flex flex-col gap-4 overflow-y-auto border-l border-slate-800 p-4">
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Live System</h3>
                 <div className="mt-2">
-                  <MetricStrip metrics={currentFrame?.systemMetrics ?? {}} />
+                  <MetricStrip metrics={currentFrame?.systemMetrics ?? {}} visibleKeys={liveMetricKeys} />
                 </div>
               </div>
 
@@ -399,69 +428,26 @@ export function StressLabTab({
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 border-t border-slate-800 p-4">
-            <div className="flex items-center gap-2">
-              <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                  playback.status === "playing" ? "bg-emerald-950 text-emerald-300" : "bg-slate-800 text-slate-300"
-                }`}
-              >
-                {playback.status === "playing" ? "Running" : "Paused"}
-              </span>
-              <TimelineControls
-                frames={lab.activeResult.frames}
-                playback={playback}
-                speed={speed}
-                onSpeedChange={setSpeed}
-                onPlay={state.onPlay}
-                onPause={state.onPause}
-                onNext={state.onNext}
-                onPrevious={state.onPrevious}
-                onRestart={state.onRestart}
-                onScrub={state.onScrub}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {primaryChartKeys.map((key, i) => (
-                <TimeSeriesChart
-                  key={key}
-                  data={chartSeries}
-                  dataKey={key}
-                  label={formatMetricLabel(key)}
-                  color={CHART_COLORS[i % CHART_COLORS.length]!}
-                  currentTimeSeconds={currentFrame?.timestampSeconds ?? 0}
-                  onScrub={scrubToTime}
-                  highlighted={!!selectedRequirementBottleneck && selectedRequirementBottleneck.metric === key}
-                />
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
-              <div className="flex flex-col gap-4">
-                <RunCompletionSummary passed={lab.activeResult.passed} requirements={lab.activeResult.requirementResults} bottlenecks={lab.activeResult.bottlenecks} onModify={() => setView("modify")} onRerun={lab.runTest} />
-
-                {lab.comparisonRun && lab.activeRun && (
-                  <ComparisonPanel baseline={lab.comparisonRun} current={lab.activeRun} isStrict={lab.runIsStrictComparison} />
-                )}
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Event Timeline</p>
-                <div className="mt-2 max-h-48 overflow-y-auto">
-                  <EventTimelinePanel events={timelineEvents} onJumpTo={scrubToTime} />
-                </div>
-              </div>
-            </div>
-
-            <RunHistoryPanel
-              runs={lab.runsForSelectedTest}
-              activeRunId={lab.activeRun?.id}
-              onSelect={(run) => {
-                // Selecting a historical run shows its persisted summary; frames replay only for the just-computed activeResult (spec #43).
-                if (run.id === lab.activeRun?.id) return;
-              }}
-            />
-          </div>
+          <AnalysisDrawer
+            chartSeries={chartSeries}
+            primaryChartKeys={primaryChartKeys}
+            currentTimeSeconds={currentFrame?.timestampSeconds ?? 0}
+            onScrub={scrubToTime}
+            highlightedMetric={selectedRequirementBottleneck?.metric}
+            comparison={
+              lab.comparisonRun && lab.activeRun
+                ? { baseline: lab.comparisonRun, current: lab.activeRun, isStrict: lab.runIsStrictComparison }
+                : undefined
+            }
+            timelineEvents={timelineEvents}
+            runs={lab.runsForSelectedTest}
+            activeRunId={lab.activeRun?.id}
+            onSelectRun={(run) => {
+              // Selecting a historical run shows its persisted summary; frames replay only for the just-computed activeResult (spec #43).
+              if (run.id === lab.activeRun?.id) return;
+            }}
+            defaultExpanded={mode === "analyze"}
+          />
         </>
       )}
     </div>

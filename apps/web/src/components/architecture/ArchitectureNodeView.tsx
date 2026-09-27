@@ -60,7 +60,7 @@ export function ArchitectureNodeView({ data, selected }: NodeProps<ArchitectureF
       role="button"
       tabIndex={0}
       aria-pressed={selected}
-      className={`rounded-md border bg-slate-900 text-left shadow-sm transition-shadow ${dense ? "w-64 px-4 py-3" : "w-48 px-3 py-2"} ${CATEGORY_BORDER[data.category]} ${
+      className={`rounded-md border bg-slate-900 text-left shadow-sm transition-shadow ${dense ? "w-80 px-5 py-4" : "w-48 px-3 py-2"} ${CATEGORY_BORDER[data.category]} ${
         selected ? "ring-2 ring-sky-400" : (stressRing ?? "")
       }`}
     >
@@ -79,18 +79,18 @@ export function ArchitectureNodeView({ data, selected }: NodeProps<ArchitectureF
           </span>
         )}
       </div>
-      <p className={`mt-0.5 font-medium text-slate-100 ${dense ? "text-base" : "text-sm"}`}>{data.label}</p>
+      <p className={`mt-0.5 font-medium text-slate-100 ${dense ? "text-lg" : "text-sm"}`}>{data.label}</p>
       {!dense && <p className="mt-0.5 truncate text-xs text-slate-400">{data.summary}</p>}
       {data.reviewed && <p className="mt-1 text-[10px] font-medium text-emerald-400">✓ Reviewed</p>}
       {data.stressState && data.stressState !== "normal" && (
-        <p className={`mt-1 font-semibold text-amber-400 ${dense ? "text-xs" : "text-[10px]"}`}>{STRESS_STATE_LABEL[data.stressState]}</p>
+        <p className={`mt-1 font-semibold text-amber-400 ${dense ? "text-sm" : "text-[10px]"}`}>{STRESS_STATE_LABEL[data.stressState]}</p>
       )}
       {metricEntries.length > 0 && (
-        <dl className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 border-t border-slate-800 pt-2">
+        <dl className={`mt-2 grid grid-cols-2 gap-x-3 border-t border-slate-800 ${dense ? "gap-y-2 pt-3" : "gap-y-1 pt-2"}`}>
           {metricEntries.map(([key, value]) => (
             <div key={key} className="min-w-0">
-              <dt className="truncate text-[10px] uppercase tracking-wide text-slate-500">{key}</dt>
-              <dd className="truncate font-mono text-xs text-slate-200">{value}</dd>
+              <dt className={`truncate uppercase tracking-wide text-slate-500 ${dense ? "text-xs" : "text-[10px]"}`}>{key}</dt>
+              <dd className={`truncate font-mono text-slate-200 ${dense ? "text-sm" : "text-xs"}`}>{value}</dd>
             </div>
           ))}
         </dl>

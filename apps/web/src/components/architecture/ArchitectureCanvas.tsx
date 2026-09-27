@@ -143,7 +143,7 @@ export function ArchitectureCanvas({
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
-        fitViewOptions={{ padding: 0.15, maxZoom: 1.5 }}
+        fitViewOptions={{ padding: 0.08, maxZoom: 1.5 }}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}

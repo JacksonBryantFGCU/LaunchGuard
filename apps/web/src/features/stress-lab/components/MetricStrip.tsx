@@ -3,18 +3,21 @@ const METRIC_LABELS: Record<string, string> = {
   dbUtilizationPercent: "DB Utilization",
   totalConnections: "DB Connections",
   trafficRequestsPerMinute: "Traffic",
+  availabilityPercent: "Availability",
 };
 
 function formatMetric(key: string, value: number): string {
   if (key === "checkoutP95Ms") return value >= 1000 ? `${(value / 1000).toFixed(2)}s` : `${Math.round(value)}ms`;
-  if (key === "dbUtilizationPercent") return `${Math.round(value)}%`;
+  if (key === "dbUtilizationPercent" || key === "availabilityPercent") return `${Math.round(value)}%`;
   if (key === "trafficRequestsPerMinute") return `${Math.round(value).toLocaleString()} rpm`;
   return value.toLocaleString();
 }
 
 // Only scenario-relevant metrics the backend actually returned (spec #25) - never a full raw telemetry dump.
-export function MetricStrip({ metrics }: { metrics: Record<string, number> }) {
-  const entries = Object.entries(metrics).filter(([key]) => key in METRIC_LABELS);
+// `visibleKeys` narrows further to the 3-4 metrics relevant to the active test category (spec #10); omitted, every known metric present is shown.
+export function MetricStrip({ metrics, visibleKeys }: { metrics: Record<string, number>; visibleKeys?: string[] }) {
+  const allowedKeys = visibleKeys ?? Object.keys(METRIC_LABELS);
+  const entries = Object.entries(metrics).filter(([key]) => key in METRIC_LABELS && allowedKeys.includes(key));
   if (entries.length === 0) return null;
   return (
     <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
