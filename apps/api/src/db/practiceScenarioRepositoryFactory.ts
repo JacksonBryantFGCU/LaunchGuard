@@ -17,7 +17,7 @@ export function createDefaultPracticeScenarioRepository(): PracticeScenarioRepos
   }
 
   console.warn(
-    "[redline-api] SUPABASE_URL/SUPABASE_SECRET_KEY are not set - falling back to an in-memory practice scenario repository. Practice data will not persist across restarts.",
+    "[purgatory-api] SUPABASE_URL/SUPABASE_SECRET_KEY are not set - falling back to an in-memory practice scenario repository. Practice data will not persist across restarts.",
   );
   return new InMemoryPracticeScenarioRepository();
 }

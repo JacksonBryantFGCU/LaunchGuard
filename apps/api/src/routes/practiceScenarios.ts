@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listPracticeScenarios, getPracticeScenarioById } from "@redline/scenarios";
+import { listPracticeScenarios, getPracticeScenarioById } from "@purgatory/scenarios";
 
 // Public - practice scenario content (situation, objective, prompts) carries
 // no scoring truth, same trust level as /api/scenarios.

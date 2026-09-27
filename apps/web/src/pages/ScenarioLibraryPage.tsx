@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ArchitectureScenarioPreview } from "@redline/shared";
+import type { ArchitectureScenarioPreview } from "@purgatory/shared";
 import { getScenarioPreviews } from "../features/scenarios/api.js";
 import { ApiError } from "../lib/api/client.js";
 import { ScenarioCard } from "../components/scenarios/ScenarioCard.js";

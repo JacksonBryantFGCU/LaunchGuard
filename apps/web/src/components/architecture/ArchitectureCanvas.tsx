@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ReactFlow, Background, Controls, MarkerType, type Node, type Edge } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import type { ArchitectureEdge, ArchitectureNode, EdgeEffectState, NodeEffectState } from "@redline/shared";
+import type { ArchitectureEdge, ArchitectureNode, EdgeEffectState, NodeEffectState } from "@purgatory/shared";
 import { ArchitectureNodeView } from "./ArchitectureNodeView.js";
 import { StressRuntimeEdge } from "./StressRuntimeEdge.js";
 import type { ArchitectureSelection } from "../../features/architecture-review/useSelection.js";

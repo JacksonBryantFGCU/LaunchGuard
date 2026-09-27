@@ -1,4 +1,4 @@
-import type { ArchitectConversationTurn, ConversationSpeaker } from "@redline/shared";
+import type { ArchitectConversationTurn, ConversationSpeaker } from "@purgatory/shared";
 
 // Mirrors @elevenlabs/client's MessagePayload.role ("user" | "agent") -
 // the app never depends on the raw provider event shape beyond this input.

@@ -1,5 +1,5 @@
-import { StressTestRevealListSchema, type StressTestRevealList } from "@redline/shared";
-import { getInternalScenarioBySlug, toPublicStressTests } from "@redline/scenarios/internal";
+import { StressTestRevealListSchema, type StressTestRevealList } from "@purgatory/shared";
+import { getInternalScenarioBySlug, toPublicStressTests } from "@purgatory/scenarios/internal";
 import type { ReviewRepository } from "./reviewRepository.js";
 import type { PracticeScenarioRepository } from "./practiceScenarioRepository.js";
 

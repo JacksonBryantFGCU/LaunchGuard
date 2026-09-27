@@ -1,4 +1,4 @@
-import type { SimulationBottleneck } from "@redline/shared";
+import type { SimulationBottleneck } from "@purgatory/shared";
 
 const SEVERITY_RANK: Record<SimulationBottleneck["severity"], number> = { low: 0, medium: 1, high: 2, critical: 3 };
 

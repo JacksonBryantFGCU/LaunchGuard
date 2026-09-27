@@ -1,4 +1,4 @@
-import type { StressParameterDefinition, StressProfile } from "@redline/shared";
+import type { StressParameterDefinition, StressProfile } from "@purgatory/shared";
 import type { StressParameterValues } from "../parameterState.js";
 
 function formatValue(def: StressParameterDefinition, value: number): string {

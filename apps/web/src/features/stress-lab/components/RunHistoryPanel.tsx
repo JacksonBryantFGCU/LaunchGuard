@@ -1,4 +1,4 @@
-import type { StressSimulationRunRecord } from "@redline/shared";
+import type { StressSimulationRunRecord } from "@purgatory/shared";
 import { describeModificationDelta } from "../runHistory.js";
 import { countRequirementStatuses, formatRequirementScore } from "../resultSummary.js";
 

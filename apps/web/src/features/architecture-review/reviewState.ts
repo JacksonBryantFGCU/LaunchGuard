@@ -6,7 +6,7 @@ import type {
   RedlineSeverity,
   RedlineTargetType,
   ReviewSession,
-} from "@redline/shared";
+} from "@purgatory/shared";
 
 export type SubmissionStatus = "draft" | "submitting" | "submitted" | "error";
 

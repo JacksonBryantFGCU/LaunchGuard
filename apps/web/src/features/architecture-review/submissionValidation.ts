@@ -1,4 +1,4 @@
-import { SubmitSessionRequestSchema, type SubmitSessionRequest } from "@redline/shared";
+import { SubmitSessionRequestSchema, type SubmitSessionRequest } from "@purgatory/shared";
 import type { ReviewState } from "./reviewState.js";
 
 export type SubmissionValidationResult =

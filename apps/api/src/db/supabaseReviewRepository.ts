@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import type { ArchitectConversationTurn, Redline } from "@redline/shared";
+import type { ArchitectConversationTurn, Redline } from "@purgatory/shared";
 import {
   SessionLockedError,
   type DraftPatch,

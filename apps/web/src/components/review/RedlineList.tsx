@@ -1,4 +1,4 @@
-import type { Redline } from "@redline/shared";
+import type { Redline } from "@purgatory/shared";
 import { Badge } from "../ui/Badge.js";
 import { RISK_CATEGORY_LABELS, SEVERITY_LABELS } from "../../features/scenarios/labels.js";
 

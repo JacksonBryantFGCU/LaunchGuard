@@ -1,4 +1,4 @@
-import type { SimulationFrame } from "@redline/shared";
+import type { SimulationFrame } from "@purgatory/shared";
 import type { PlaybackState } from "../playback.js";
 
 function formatSimulatedTime(seconds: number): string {

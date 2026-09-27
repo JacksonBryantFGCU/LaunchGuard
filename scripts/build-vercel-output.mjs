@@ -15,7 +15,7 @@ execSync("pnpm --filter web run build", { stdio: "inherit" });
 const funcDir = `${outDir}/functions/api/index.func`;
 mkdirSync(funcDir, { recursive: true });
 
-// @redline/scenarios and @redline/shared ship raw .ts as their package.json
+// @purgatory/scenarios and @purgatory/shared ship raw .ts as their package.json
 // "main" with no build step, which only works when something (tsx, Vite)
 // transforms TS-in-node_modules on the fly - Vercel's Node runtime doesn't.
 // Bundling everything (no externals) means the function is one

@@ -131,7 +131,7 @@ test("evidenceInputToRow maps camelCase input to a snake_case insert row", () =>
 });
 
 test("toResultRecord preserves the jsonb result_data payload", () => {
-  const resultData = { objectiveScore: 10, maxObjectiveScore: 16 } as unknown as import("@redline/shared").ScenarioEvaluationResult;
+  const resultData = { objectiveScore: 10, maxObjectiveScore: 16 } as unknown as import("@purgatory/shared").ScenarioEvaluationResult;
   const record = toResultRecord({
     objective_score: 10,
     objective_max_score: 16,

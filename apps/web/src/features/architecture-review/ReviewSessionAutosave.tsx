@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Redline } from "@redline/shared";
+import type { Redline } from "@purgatory/shared";
 import { useReviewState } from "./reviewStateStore.js";
 import { isReviewLocked } from "./reviewState.js";
 import { updateDraft, addRedline, updateRedline, deleteRedline, addTranscriptTurn } from "../review-session/api.js";

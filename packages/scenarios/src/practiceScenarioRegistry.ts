@@ -1,4 +1,4 @@
-import type { PracticeScenario } from "@redline/shared";
+import type { PracticeScenario } from "@purgatory/shared";
 import { toPublicPracticeScenario } from "./internalPracticeScenario.js";
 import { blackFridayPracticeScenarios } from "./black-friday-checkout/practiceScenarios.js";
 

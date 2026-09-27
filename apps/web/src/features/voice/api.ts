@@ -1,4 +1,4 @@
-import { VoiceSessionResponseSchema, type VoiceSessionFocus, type VoiceSessionResponse } from "@redline/shared";
+import { VoiceSessionResponseSchema, type VoiceSessionFocus, type VoiceSessionResponse } from "@purgatory/shared";
 import { apiPost } from "../../lib/api/client.js";
 
 export function createVoiceSession(scenarioSlug: string, focus?: VoiceSessionFocus): Promise<VoiceSessionResponse> {

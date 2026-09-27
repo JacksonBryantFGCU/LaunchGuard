@@ -1,4 +1,4 @@
-import type { StressSimulationRunRecord } from "@redline/shared";
+import type { StressSimulationRunRecord } from "@purgatory/shared";
 import { classifyMetricChange } from "../comparison.js";
 import { compareRequirementResults } from "../comparison.js";
 import { countRequirementStatuses, formatRequirementScore } from "../resultSummary.js";

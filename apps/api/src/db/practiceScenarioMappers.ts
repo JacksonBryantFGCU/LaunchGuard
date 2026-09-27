@@ -6,7 +6,7 @@ import type {
   SimulationBottleneck,
   SimulationRequirementResult,
   StressParameterValues,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import type { PracticeScenarioStatus } from "../services/practiceScenarioStateMachine.js";
 import type {
   EvidenceSourceType,

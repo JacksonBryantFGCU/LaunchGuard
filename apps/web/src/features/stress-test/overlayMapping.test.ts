@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { StressTestStepReveal } from "@redline/shared";
+import type { StressTestStepReveal } from "@purgatory/shared";
 import { computeStressOverlay } from "./overlayMapping.js";
 
 function step(overrides: Partial<StressTestStepReveal> = {}): StressTestStepReveal {

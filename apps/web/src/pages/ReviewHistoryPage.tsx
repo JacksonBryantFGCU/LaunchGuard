@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import type { ReviewHistoryItem } from "@redline/shared";
+import type { ReviewHistoryItem } from "@purgatory/shared";
 import { getReviewHistory } from "../features/review-session/api.js";
 import { listPracticeScenarios, listPracticeScenarioAttemptSummaries } from "../features/practice-scenarios/api.js";
 import { deriveScenarioListStatus } from "../features/practice-scenarios/practiceProgression.js";

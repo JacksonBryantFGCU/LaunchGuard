@@ -7,7 +7,7 @@ import {
   type Redline,
   type ArchitectConversationTurn,
   type StressProgress,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { apiGet, apiPatch, apiPost, apiDelete } from "../../lib/api/client.js";
 
 const parseSession = (data: unknown) => ReviewSessionSchema.parse(data);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AddComponentModification, ArchitectureEdge, ArchitectureNode, InterventionDefinition } from "@redline/shared";
+import type { AddComponentModification, ArchitectureEdge, ArchitectureNode, InterventionDefinition } from "@purgatory/shared";
 import { addIntervention, removeIntervention } from "../interventionEditor.js";
 
 // Minimal "Modify Architecture" editor (spec #33/#34): not a drag-and-drop

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { ArchitectureScenarioPreview } from "@redline/shared";
+import type { ArchitectureScenarioPreview } from "@purgatory/shared";
 import { Badge } from "../ui/Badge.js";
 import { DIFFICULTY_LABELS, FOCUS_LABELS } from "../../features/scenarios/labels.js";
 

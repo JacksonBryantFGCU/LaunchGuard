@@ -1,4 +1,4 @@
-import { PublicArchitectureScenarioSchema, type PublicArchitectureScenario } from "@redline/shared";
+import { PublicArchitectureScenarioSchema, type PublicArchitectureScenario } from "@purgatory/shared";
 
 export const blackFridayCheckoutScenario: PublicArchitectureScenario = PublicArchitectureScenarioSchema.parse({
   id: "black-friday-checkout",
@@ -77,7 +77,7 @@ export const blackFridayCheckoutScenario: PublicArchitectureScenario = PublicArc
     {
       id: "con-pci",
       summary:
-        "Payment processing must stay within existing PCI compliance scope; card data should not be handled directly by Redline's own services.",
+        "Payment processing must stay within existing PCI compliance scope; card data should not be handled directly by Purgatory's own services.",
     },
     {
       id: "con-postgres-expertise",

@@ -1,4 +1,4 @@
-import type { ArchitectureConnectionDetails, ArchitectureEdge, ArchitectureNode } from "@redline/shared";
+import type { ArchitectureConnectionDetails, ArchitectureEdge, ArchitectureNode } from "@purgatory/shared";
 import { Fact } from "./InspectorFacts.js";
 
 interface ConnectionInspectorProps {

@@ -1,4 +1,4 @@
-import type { ArchitectConversationTurn } from "@redline/shared";
+import type { ArchitectConversationTurn } from "@purgatory/shared";
 
 interface Props {
   transcript: ArchitectConversationTurn[];

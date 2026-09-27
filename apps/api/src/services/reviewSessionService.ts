@@ -1,4 +1,4 @@
-import type { ArchitectConversationTurn, Redline, ReviewHistoryItem, ReviewSession } from "@redline/shared";
+import type { ArchitectConversationTurn, Redline, ReviewHistoryItem, ReviewSession } from "@purgatory/shared";
 import {
   StartReviewSessionRequestSchema,
   UpdateDraftRequestSchema,
@@ -7,9 +7,9 @@ import {
   TranscriptTurnRequestSchema,
   StressProgressRequestSchema,
   SubmitSessionRequestSchema,
-} from "@redline/shared";
-import { getPublicScenarioBySlug } from "@redline/scenarios";
-import { getInternalScenarioBySlug } from "@redline/scenarios/internal";
+} from "@purgatory/shared";
+import { getPublicScenarioBySlug } from "@purgatory/scenarios";
+import { getInternalScenarioBySlug } from "@purgatory/scenarios/internal";
 import {
   SessionLockedError,
   type ReviewRepository,

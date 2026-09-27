@@ -2,7 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "private": true,
-  "description": "Redline API",
+  "description": "Purgatory API",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@clerk/express": "^2.1.72",
-    "@redline/scenarios": "workspace:*",
-    "@redline/shared": "workspace:*",
+    "@purgatory/scenarios": "workspace:*",
+    "@purgatory/shared": "workspace:*",
     "@supabase/supabase-js": "^2.117.2",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",

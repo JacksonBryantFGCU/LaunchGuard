@@ -15,7 +15,7 @@ export function LandingPage() {
     <div className="min-h-svh bg-slate-950 text-slate-100">
       <header className="border-b border-slate-800">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-          <span className="text-sm font-semibold tracking-tight">Redline</span>
+          <span className="text-sm font-semibold tracking-tight">Purgatory</span>
           <nav className="flex items-center gap-6 text-sm">
             <a href="#how-it-works" className="text-slate-400 hover:text-slate-100">
               How It Works
@@ -104,7 +104,7 @@ export function LandingPage() {
 
         <section className="border-t border-slate-800 py-20">
           <div className="mx-auto max-w-6xl px-6">
-            <h2 className="text-sm font-semibold tracking-widest text-slate-500 uppercase">What Redline Trains</h2>
+            <h2 className="text-sm font-semibold tracking-widest text-slate-500 uppercase">What Purgatory Trains</h2>
             <ul className="mt-6 flex flex-wrap gap-3">
               {TRAINED_ON.map((topic) => (
                 <li

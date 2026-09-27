@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import type { ArchitectureRecommendation } from "@redline/shared";
+import type { ArchitectureRecommendation } from "@purgatory/shared";
 import { useReviewState } from "../features/architecture-review/reviewStateStore.js";
 import { validateSubmission } from "../features/architecture-review/submissionValidation.js";
 import { submitReviewSession } from "../features/review-session/api.js";

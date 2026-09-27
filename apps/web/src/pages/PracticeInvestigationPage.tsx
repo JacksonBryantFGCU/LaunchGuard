@@ -7,7 +7,7 @@ import type {
   PracticeResponseDraft,
   ArchitectureNode,
   ArchitectureEdge,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { usePracticeAttempt } from "../features/practice-scenarios/practiceAttemptStore.js";
 import { resolveResourceTab, isResponseLocked, type ResourceTab } from "../features/practice-scenarios/practiceWorkflow.js";
 import { useSelection } from "../features/architecture-review/useSelection.js";

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { PublicArchitectureScenario } from "@redline/shared";
+import type { PublicArchitectureScenario } from "@purgatory/shared";
 import { ReviewProgress } from "../review/ReviewProgress.js";
 
 interface ReviewFooterProps {

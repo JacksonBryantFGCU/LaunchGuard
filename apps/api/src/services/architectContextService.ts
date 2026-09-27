@@ -1,5 +1,5 @@
-import type { InternalArchitectureScenario } from "@redline/scenarios/internal";
-import type { VoiceSessionFocus } from "@redline/shared";
+import type { InternalArchitectureScenario } from "@purgatory/scenarios/internal";
+import type { VoiceSessionFocus } from "@purgatory/shared";
 
 function bulletList(items: string[]): string {
   return items.map((item) => `- ${item}`).join("\n");

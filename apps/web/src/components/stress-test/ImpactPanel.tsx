@@ -1,4 +1,4 @@
-import type { PublicArchitectureScenario, RequirementImpactStatus, StressTestReveal, StressTestStepReveal } from "@redline/shared";
+import type { PublicArchitectureScenario, RequirementImpactStatus, StressTestReveal, StressTestStepReveal } from "@purgatory/shared";
 
 const STATUS_LABEL: Record<RequirementImpactStatus, string> = {
   met: "✓ Met",

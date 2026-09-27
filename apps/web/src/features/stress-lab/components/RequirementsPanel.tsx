@@ -1,4 +1,4 @@
-import type { SimulationBottleneck, SimulationRequirementResult } from "@redline/shared";
+import type { SimulationBottleneck, SimulationRequirementResult } from "@purgatory/shared";
 import { correlateRequirementBottleneck } from "../resultSummary.js";
 
 const STATUS_LABEL: Record<SimulationRequirementResult["status"], string> = { met: "PASS", at_risk: "AT RISK", violated: "FAIL" };

@@ -1,5 +1,5 @@
 import { Router, type Response } from "express";
-import { UpdateLeaderboardProfileRequestSchema } from "@redline/shared";
+import { UpdateLeaderboardProfileRequestSchema } from "@purgatory/shared";
 import { getUserId } from "../middleware/auth.js";
 import type { LeaderboardRepository } from "../services/leaderboardRepository.js";
 import {

@@ -1,4 +1,4 @@
-import type { AddComponentModification, InterventionDefinition, InterventionTarget } from "@redline/shared";
+import type { AddComponentModification, InterventionDefinition, InterventionTarget } from "@purgatory/shared";
 
 /** Mirrors the backend's placement rule (packages/scenarios/src/stressLab/compatibility.ts) - both operate purely on public InterventionDefinition/InterventionTarget data, so there's no private truth to duplicate. */
 export function isValidPlacement(intervention: InterventionDefinition, target: InterventionTarget): boolean {

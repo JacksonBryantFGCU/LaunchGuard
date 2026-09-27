@@ -4,8 +4,8 @@ import type {
   StressParameterValues,
   StressProfile,
   StressTestTimelineResult,
-} from "@redline/shared";
-import { getStressLabDefinition, runStressLabSimulation } from "@redline/scenarios/internal";
+} from "@purgatory/shared";
+import { getStressLabDefinition, runStressLabSimulation } from "@purgatory/scenarios/internal";
 import type { ReviewRepository } from "./reviewRepository.js";
 import { requireOwnedSession } from "./reviewSessionService.js";
 import type { PracticeScenarioRepository, StressSimulationRunRecord } from "./practiceScenarioRepository.js";

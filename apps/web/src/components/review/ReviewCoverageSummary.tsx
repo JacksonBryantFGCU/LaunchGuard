@@ -1,4 +1,4 @@
-import type { Redline } from "@redline/shared";
+import type { Redline } from "@purgatory/shared";
 import { RISK_CATEGORY_LABELS, SEVERITY_LABELS, SEVERITY_ORDER } from "../../features/scenarios/labels.js";
 import { ReviewProgress } from "./ReviewProgress.js";
 

@@ -1,4 +1,4 @@
-import type { SimulationBottleneck, SimulationRequirementResult } from "@redline/shared";
+import type { SimulationBottleneck, SimulationRequirementResult } from "@purgatory/shared";
 
 export interface RequirementStatusCounts {
   met: number;

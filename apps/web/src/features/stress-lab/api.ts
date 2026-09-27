@@ -10,7 +10,7 @@ import {
   type StressSimulationRunRecord,
   type ArchitectureModification,
   type StressParameterValues,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { apiGet, apiPost } from "../../lib/api/client.js";
 
 const basePath = (reviewSessionId: string, practiceScenarioId: string) =>

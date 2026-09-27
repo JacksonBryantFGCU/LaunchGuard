@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { InterventionDefinition } from "@redline/shared";
+import type { InterventionDefinition } from "@purgatory/shared";
 import { isValidPlacement, addIntervention, removeIntervention, configureIntervention } from "./interventionEditor.js";
 
 const pooler: InterventionDefinition = {

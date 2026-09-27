@@ -1,4 +1,4 @@
-import { StressTestRevealListSchema } from "@redline/shared";
+import { StressTestRevealListSchema } from "@purgatory/shared";
 import { apiGet } from "../../lib/api/client.js";
 
 export function getStressTests(reviewId: string) {

@@ -1,4 +1,4 @@
-import type { PublicArchitectureScenario } from "@redline/shared";
+import type { PublicArchitectureScenario } from "@purgatory/shared";
 import { Badge } from "../ui/Badge.js";
 
 export function ScenarioHeader({ scenario }: { scenario: PublicArchitectureScenario }) {

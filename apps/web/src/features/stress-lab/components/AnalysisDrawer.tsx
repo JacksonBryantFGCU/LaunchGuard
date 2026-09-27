@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { SimulationEvent, StressSimulationRunRecord } from "@redline/shared";
+import type { SimulationEvent, StressSimulationRunRecord } from "@purgatory/shared";
 import type { ChartRow } from "../chartData.js";
 import { TimeSeriesChart } from "./TimeSeriesChart.js";
 import { EventTimelinePanel } from "./EventTimelinePanel.js";

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { StressProfile } from "@redline/shared";
+import type { StressProfile } from "@purgatory/shared";
 import { initializeParameterValues, setParameterValue, resetParameterValues } from "./parameterState.js";
 
 const profile: StressProfile = {

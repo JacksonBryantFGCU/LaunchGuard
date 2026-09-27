@@ -1,4 +1,4 @@
-import type { SimulationBottleneck, SimulationEvent, SimulationFrame } from "@redline/shared";
+import type { SimulationBottleneck, SimulationEvent, SimulationFrame } from "@purgatory/shared";
 
 export type ChartRow = { timestampSeconds: number } & Record<string, number>;
 

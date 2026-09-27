@@ -1,4 +1,4 @@
-import type { PracticeScenarioStatus } from "@redline/shared";
+import type { PracticeScenarioStatus } from "@purgatory/shared";
 
 export const RESOURCE_TABS = ["overview", "metrics", "requirements", "architecture", "stress-lab", "architect", "response"] as const;
 export type ResourceTab = (typeof RESOURCE_TABS)[number];

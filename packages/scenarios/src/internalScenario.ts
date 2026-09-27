@@ -8,7 +8,7 @@ import {
   StressTestRevealSchema,
   type PublicArchitectureScenario,
   type StressTestReveal,
-} from "@redline/shared";
+} from "@purgatory/shared";
 
 // Private scenario truth. Never exported through this package's public
 // index.ts, and never sent to the API/frontend - only toPublicScenario()'s

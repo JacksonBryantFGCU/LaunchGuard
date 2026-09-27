@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { SimulationFrame } from "@redline/shared";
+import type { SimulationFrame } from "@purgatory/shared";
 import { mapFrameToNodeStates, mapFrameToEdgeStates, mapFrameToNodeMetrics } from "./runtimeMapping.js";
 
 const frame: SimulationFrame = {

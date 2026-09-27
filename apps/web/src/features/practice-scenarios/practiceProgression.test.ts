@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { PracticeScenario, PracticeScenarioAttemptSummary } from "@redline/shared";
+import type { PracticeScenario, PracticeScenarioAttemptSummary } from "@purgatory/shared";
 import { deriveScenarioListStatus } from "./practiceProgression.js";
 
 function scenario(order: number, id: string): PracticeScenario {

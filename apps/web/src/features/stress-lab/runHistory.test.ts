@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { StressSimulationRunRecord } from "@redline/shared";
+import type { StressSimulationRunRecord } from "@purgatory/shared";
 import { groupRunsByTest, deriveBaselineRun, latestRun, describeModificationDelta } from "./runHistory.js";
 
 function fakeRun(overrides: Partial<StressSimulationRunRecord> = {}): StressSimulationRunRecord {

@@ -1,4 +1,4 @@
-import type { StressProfile } from "@redline/shared";
+import type { StressProfile } from "@purgatory/shared";
 
 export type StressParameterValues = Record<string, number>;
 

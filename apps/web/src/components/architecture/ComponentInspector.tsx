@@ -1,4 +1,4 @@
-import type { ArchitectureComponentDetails, ArchitectureNode } from "@redline/shared";
+import type { ArchitectureComponentDetails, ArchitectureNode } from "@purgatory/shared";
 import { NODE_CATEGORY_LABELS } from "../../features/scenarios/labels.js";
 import { Fact, FactList } from "./InspectorFacts.js";
 

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { ArchitectConversationTurn, Redline } from "@redline/shared";
+import type { ArchitectConversationTurn, Redline } from "@purgatory/shared";
 import { createInitialReviewState, isReviewLocked, redlinesForTarget, reviewReducer, type ReviewState } from "./reviewState.js";
 
 function turn(overrides: Partial<ArchitectConversationTurn> = {}): ArchitectConversationTurn {

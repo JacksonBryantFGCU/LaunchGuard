@@ -1,5 +1,5 @@
-import type { LeaderboardEntryRow, UpdateLeaderboardProfileRequest, LeaderboardProfile } from "@redline/shared";
-import { getPracticeScenarioById, listPracticeScenarios } from "@redline/scenarios";
+import type { LeaderboardEntryRow, UpdateLeaderboardProfileRequest, LeaderboardProfile } from "@purgatory/shared";
+import { getPracticeScenarioById, listPracticeScenarios } from "@purgatory/scenarios";
 import type { LeaderboardRepository } from "./leaderboardRepository.js";
 
 export type ServiceFailure = { ok: false; status: number; error: string; message: string };

@@ -4,7 +4,7 @@ import type {
   ArchitectureNodeCategory,
   ArchitectureRiskCategory,
   RedlineSeverity,
-} from "@redline/shared";
+} from "@purgatory/shared";
 
 export const DIFFICULTY_LABELS: Record<ArchitectureDifficulty, string> = {
   mid: "Mid-Level",

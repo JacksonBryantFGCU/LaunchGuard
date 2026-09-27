@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AddComponentModification, PracticeScenario, PublicArchitectureScenario, SimulationBottleneck } from "@redline/shared";
+import type { AddComponentModification, PracticeScenario, PublicArchitectureScenario, SimulationBottleneck } from "@purgatory/shared";
 import { ArchitectureCanvas } from "../../components/architecture/ArchitectureCanvas.js";
 import { TestSelector } from "./components/TestSelector.js";
 import { ParameterForm } from "./components/ParameterForm.js";

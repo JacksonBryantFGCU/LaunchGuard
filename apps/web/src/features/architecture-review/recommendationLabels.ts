@@ -1,4 +1,4 @@
-import type { ArchitectureRecommendation } from "@redline/shared";
+import type { ArchitectureRecommendation } from "@purgatory/shared";
 
 export const RECOMMENDATION_ORDER: ArchitectureRecommendation[] = [
   "approve",

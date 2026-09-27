@@ -1,5 +1,5 @@
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import type { ConceptCheck } from "@redline/shared";
+import type { ConceptCheck } from "@purgatory/shared";
 import { usePracticeAttempt } from "../features/practice-scenarios/practiceAttemptStore.js";
 import { canOpenConsequence, canOpenResult } from "../features/practice-scenarios/practiceWorkflow.js";
 import { buildMockAttemptView, type MockResultPreset } from "../features/practice-scenarios/devMockResult.js";

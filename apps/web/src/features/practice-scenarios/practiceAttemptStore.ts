@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { PracticeScenarioAttemptView, PracticeResponseDraft, ScenarioEvaluationResult, AddPracticeEvidenceRequest } from "@redline/shared";
+import type { PracticeScenarioAttemptView, PracticeResponseDraft, ScenarioEvaluationResult, AddPracticeEvidenceRequest } from "@purgatory/shared";
 import type { AutosaveStatus } from "./practiceWorkflow.js";
 
 export interface PracticeAttemptContextValue {

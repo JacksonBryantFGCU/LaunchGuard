@@ -5,15 +5,15 @@ import {
   type PracticeScenarioAttemptSummary,
   type SavePracticeResponseDraftRequest,
   type AddPracticeEvidenceRequest,
-} from "@redline/shared";
-import { getPracticeScenarioById } from "@redline/scenarios";
+} from "@purgatory/shared";
+import { getPracticeScenarioById } from "@purgatory/scenarios";
 import {
   getInternalPracticeScenarioById,
   evaluateScenarioResponse,
   evaluateResilience,
   combineScenarioEvaluation,
   getStressLabDefinition,
-} from "@redline/scenarios/internal";
+} from "@purgatory/scenarios/internal";
 import type { ReviewRepository } from "./reviewRepository.js";
 import { requireOwnedSession } from "./reviewSessionService.js";
 import {

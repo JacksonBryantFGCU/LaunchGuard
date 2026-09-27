@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet, useOutletContext, useParams } from "react-router-dom";
-import type { PracticeScenario, PublicArchitectureScenario } from "@redline/shared";
+import type { PracticeScenario, PublicArchitectureScenario } from "@purgatory/shared";
 import { getPracticeScenarioById } from "../features/practice-scenarios/api.js";
 import { PracticeAttemptProvider } from "../features/practice-scenarios/PracticeAttemptContext.js";
 import { ApiError } from "../lib/api/client.js";

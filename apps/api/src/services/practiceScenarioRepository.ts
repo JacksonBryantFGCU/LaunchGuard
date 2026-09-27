@@ -7,7 +7,7 @@ import type {
   SimulationBottleneck,
   SimulationRequirementResult,
   StressParameterValues,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { canTransitionPracticeScenarioStatus, type PracticeScenarioStatus } from "./practiceScenarioStateMachine.js";
 
 export type { PracticeScenarioStatus } from "./practiceScenarioStateMachine.js";

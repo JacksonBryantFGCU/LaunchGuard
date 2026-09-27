@@ -5,7 +5,7 @@ import {
   type LeaderboardEntryRow,
   type LeaderboardProfile,
   type UpdateLeaderboardProfileRequest,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { apiGet, apiPatch } from "../../lib/api/client.js";
 
 export function getOverallLeaderboard(): Promise<LeaderboardEntryRow[]> {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import type { PracticeResponseDraft, PracticeScenarioAttemptView } from "@redline/shared";
+import type { PracticeResponseDraft, PracticeScenarioAttemptView } from "@purgatory/shared";
 import { ApiError } from "../../lib/api/client.js";
 import { isResponseLocked, nextAutosaveStatus, type AutosaveStatus } from "./practiceWorkflow.js";
 import { PracticeAttemptReactContext, type PracticeAttemptContextValue } from "./practiceAttemptStore.js";

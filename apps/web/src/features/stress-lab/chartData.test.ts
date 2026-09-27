@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { SimulationFrame } from "@redline/shared";
-import type { SimulationBottleneck } from "@redline/shared";
+import type { SimulationFrame } from "@purgatory/shared";
+import type { SimulationBottleneck } from "@purgatory/shared";
 import { framesToChartSeries, nearestFrameIndexForTime, flattenEvents, selectPrimaryChartKeys } from "./chartData.js";
 
 const frames: SimulationFrame[] = [

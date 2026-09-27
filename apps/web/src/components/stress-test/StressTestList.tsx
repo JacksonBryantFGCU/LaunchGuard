@@ -1,4 +1,4 @@
-import type { StressTestReveal } from "@redline/shared";
+import type { StressTestReveal } from "@purgatory/shared";
 import type { StressTestRunStatus } from "../../features/stress-test/stressTestState.js";
 
 const STATUS_ICON: Record<StressTestRunStatus, string> = {

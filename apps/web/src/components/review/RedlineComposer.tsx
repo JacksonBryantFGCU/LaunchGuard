@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import type { ArchitectureRiskCategory, RedlineSeverity, RedlineTargetType } from "@redline/shared";
+import type { ArchitectureRiskCategory, RedlineSeverity, RedlineTargetType } from "@purgatory/shared";
 import { RISK_CATEGORY_LABELS, SEVERITY_LABELS } from "../../features/scenarios/labels.js";
 import { validateRedlineDraft } from "../../features/architecture-review/redlineValidation.js";
 import type { RedlineDraft } from "../../features/architecture-review/reviewState.js";

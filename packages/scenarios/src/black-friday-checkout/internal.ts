@@ -280,7 +280,7 @@ const stressTests: StressTest[] = [
         sequence: 1,
         title: "Payment provider latency rises",
         description: "The provider's p99 latency rises from 1.8s to 15s.",
-        nodeEffects: [{ nodeId: "payment-provider", state: "degraded", metricLabel: "p99 latency", metricValue: "15s", explanation: "External provider is degraded outside Redline's control." }],
+        nodeEffects: [{ nodeId: "payment-provider", state: "degraded", metricLabel: "p99 latency", metricValue: "15s", explanation: "External provider is degraded outside Purgatory's control." }],
         edgeEffects: [{ edgeId: "checkout-service-payment-provider", state: "degraded", explanation: "Calls to the provider now take far longer to resolve." }],
         requirementImpacts: [],
       },

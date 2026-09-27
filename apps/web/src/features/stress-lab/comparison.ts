@@ -1,4 +1,4 @@
-import type { RequirementImpactStatus, SimulationRequirementResult, StressParameterValues } from "@redline/shared";
+import type { RequirementImpactStatus, SimulationRequirementResult, StressParameterValues } from "@purgatory/shared";
 
 export type ChangeDirection = "improved" | "regressed" | "unchanged";
 

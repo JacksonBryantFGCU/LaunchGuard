@@ -9,7 +9,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <div className="flex items-center gap-6">
           <Link to="/app" className="text-sm font-semibold tracking-tight text-slate-100">
-            Redline
+            Purgatory
           </Link>
           <Link to="/app" className="text-sm text-slate-400 hover:text-slate-100">
             Practice

@@ -1,5 +1,5 @@
-import { VoiceSessionRequestSchema, VoiceSessionResponseSchema, type VoiceSessionResponse } from "@redline/shared";
-import { getInternalScenarioBySlug } from "@redline/scenarios/internal";
+import { VoiceSessionRequestSchema, VoiceSessionResponseSchema, type VoiceSessionResponse } from "@purgatory/shared";
+import { getInternalScenarioBySlug } from "@purgatory/scenarios/internal";
 import { createSignedUrl, ElevenLabsProviderError, type CreateSignedUrlInput } from "./elevenLabsService.js";
 import { buildArchitectConversationContext, buildStressLabFocusVariables } from "./architectContextService.js";
 import { env } from "../config/env.js";
@@ -22,7 +22,7 @@ const defaultDeps: VoiceSessionDeps = {
 };
 
 /**
- * Builds a Redline architect-conversation voice session. Validates the
+ * Builds a Purgatory architect-conversation voice session. Validates the
  * request, confirms the scenario exists, checks internal scenario data
  * only to build the allow-listed architect context (never serializes it
  * wholesale), and requests ElevenLabs credentials through elevenLabsService.

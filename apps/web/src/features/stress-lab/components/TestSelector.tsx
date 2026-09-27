@@ -1,4 +1,4 @@
-import type { StressProfile, StressTestCategory } from "@redline/shared";
+import type { StressProfile, StressTestCategory } from "@purgatory/shared";
 
 const CATEGORY_LABELS: Partial<Record<StressTestCategory, string>> = {
   load: "LOAD",

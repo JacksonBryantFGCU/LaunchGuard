@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ConversationProvider } from "@elevenlabs/react";
-import type { ArchitectureEdge, PublicArchitectureScenario, Redline } from "@redline/shared";
+import type { ArchitectureEdge, PublicArchitectureScenario, Redline } from "@purgatory/shared";
 import { useSelection } from "../../features/architecture-review/useSelection.js";
 import { useReviewState } from "../../features/architecture-review/reviewStateStore.js";
 import { isReviewLocked, redlinesForTarget, type RedlineDraft } from "../../features/architecture-review/reviewState.js";

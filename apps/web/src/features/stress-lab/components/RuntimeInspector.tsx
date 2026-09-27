@@ -1,4 +1,4 @@
-import type { SimulationEdgeState, SimulationNodeState } from "@redline/shared";
+import type { SimulationEdgeState, SimulationNodeState } from "@purgatory/shared";
 import { Fact } from "../../../components/architecture/InspectorFacts.js";
 
 const STATE_LABEL: Record<string, string> = {

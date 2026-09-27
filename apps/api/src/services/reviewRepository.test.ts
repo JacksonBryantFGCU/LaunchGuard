@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { InMemoryReviewRepository, SessionLockedError } from "./reviewRepository.js";
-import type { Redline } from "@redline/shared";
+import type { Redline } from "@purgatory/shared";
 
 function redline(overrides: Partial<Redline> = {}): Redline {
   return {

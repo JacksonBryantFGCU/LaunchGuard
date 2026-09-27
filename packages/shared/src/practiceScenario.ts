@@ -104,7 +104,7 @@ export const ResilienceEvaluationSchema = z.object({
 export type ResilienceEvaluation = z.infer<typeof ResilienceEvaluationSchema>;
 
 // The full result: written response + resilience, combined server-side
-// once both are known (see combineScenarioEvaluation in @redline/scenarios)
+// once both are known (see combineScenarioEvaluation in @purgatory/scenarios)
 // - never computed twice or partially on the client.
 export const ScenarioEvaluationResultSchema = WrittenResponseEvaluationSchema.merge(ResilienceEvaluationSchema).extend({
   // Not .int(): resilienceScore is a continuous share (spec: margin-based,

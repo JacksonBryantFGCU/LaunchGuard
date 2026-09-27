@@ -1,4 +1,4 @@
-import type { InterventionDefinition, StressProfile } from "@redline/shared";
+import type { InterventionDefinition, StressProfile } from "@purgatory/shared";
 import type { ComponentSimulationProfile, DatabaseSimulationProfile, RequirementTarget } from "./engine.js";
 import type { StressTimelineTestInput } from "./timeline.js";
 

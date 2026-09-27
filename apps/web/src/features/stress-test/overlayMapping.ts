@@ -1,4 +1,4 @@
-import type { EdgeEffectState, NodeEffectState, StressTestStepReveal } from "@redline/shared";
+import type { EdgeEffectState, NodeEffectState, StressTestStepReveal } from "@purgatory/shared";
 
 export interface StressOverlay {
   nodeStates: Record<string, NodeEffectState | null>;

@@ -1,4 +1,4 @@
-import type { ArchitectureScenarioPreview, PublicArchitectureScenario } from "@redline/shared";
+import type { ArchitectureScenarioPreview, PublicArchitectureScenario } from "@purgatory/shared";
 import { blackFridayCheckoutScenario } from "./black-friday-checkout/scenario.js";
 
 const scenariosBySlug = new Map<string, PublicArchitectureScenario>([

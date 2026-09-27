@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { ScenarioResponse, StressProfile } from "@redline/shared";
+import type { ScenarioResponse, StressProfile } from "@purgatory/shared";
 import { evaluateScenarioResponse, evaluateResilience, combineScenarioEvaluation } from "./scenarioEvaluator.js";
 import { InternalPracticeScenarioSchema } from "./internalPracticeScenario.js";
 

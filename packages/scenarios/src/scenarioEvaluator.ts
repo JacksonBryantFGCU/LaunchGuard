@@ -6,7 +6,7 @@ import type {
   ScenarioEvaluationResult,
   StressParameterValues,
   StressProfile,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import type { ConceptGroup, InternalPracticeScenario } from "./internalPracticeScenario.js";
 
 // Deterministic objective evaluation only (no LLM grading). Concept

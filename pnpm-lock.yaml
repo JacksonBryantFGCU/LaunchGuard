@@ -190,10 +190,10 @@ importers:
       '@clerk/express':
         specifier: ^2.1.72
         version: 2.1.72(express@5.2.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@redline/scenarios':
+      '@purgatory/scenarios':
         specifier: workspace:*
         version: link:../../packages/scenarios
-      '@redline/shared':
+      '@purgatory/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@supabase/supabase-js':
@@ -245,7 +245,7 @@ importers:
       '@elevenlabs/react':
         specifier: ^1.15.2
         version: 1.15.2(@types/dom-mediacapture-record@1.0.22)(react@19.3.0)
-      '@redline/shared':
+      '@purgatory/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@tailwindcss/vite':
@@ -315,7 +315,7 @@ importers:
 
   packages/scenarios:
     dependencies:
-      '@redline/shared':
+      '@purgatory/shared':
         specifier: workspace:*
         version: link:../shared
       zod:

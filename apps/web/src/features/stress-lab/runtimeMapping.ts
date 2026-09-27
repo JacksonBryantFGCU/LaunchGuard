@@ -1,4 +1,4 @@
-import type { EdgeEffectState, NodeEffectState, SimulationFrame } from "@redline/shared";
+import type { EdgeEffectState, NodeEffectState, SimulationFrame } from "@purgatory/shared";
 
 /** Base architecture node/edge ids are the source of truth for the overlay's keys - a frame missing a state for one falls back to null (spec #73), never dropping the node/edge from the graph. */
 export function mapFrameToNodeStates(frame: SimulationFrame, baseNodeIds: string[]): Record<string, NodeEffectState | null> {

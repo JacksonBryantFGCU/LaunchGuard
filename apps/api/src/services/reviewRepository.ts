@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { ArchitectConversationTurn, ArchitectureRecommendation, Redline } from "@redline/shared";
+import type { ArchitectConversationTurn, ArchitectureRecommendation, Redline } from "@purgatory/shared";
 
 export type ReviewSessionStatus = "draft" | "submitted";
 

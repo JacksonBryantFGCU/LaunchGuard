@@ -41,7 +41,7 @@ export async function apiGet<T>(path: string, parse: (data: unknown) => T, optio
   try {
     res = await fetch(`${API_BASE_URL}${path}`, { headers: await authHeaders(options.authed ?? false) });
   } catch {
-    throw new ApiError("Unable to reach the Redline API.");
+    throw new ApiError("Unable to reach the Purgatory API.");
   }
 
   if (!res.ok) {
@@ -80,7 +80,7 @@ async function apiMutate<T>(
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
-    throw new ApiError("Unable to reach the Redline API.");
+    throw new ApiError("Unable to reach the Purgatory API.");
   }
 
   let data: unknown;

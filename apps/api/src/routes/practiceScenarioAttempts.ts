@@ -6,7 +6,7 @@ import {
   SetResponseEvidenceRequestSchema,
   ArchitectureModificationSchema,
   StressParameterValuesSchema,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { z } from "zod";
 import { getUserId } from "../middleware/auth.js";
 import type { ReviewRepository } from "../services/reviewRepository.js";

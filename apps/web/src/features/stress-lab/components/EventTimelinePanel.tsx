@@ -1,4 +1,4 @@
-import type { SimulationEvent } from "@redline/shared";
+import type { SimulationEvent } from "@purgatory/shared";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);

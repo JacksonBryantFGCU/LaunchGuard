@@ -5,7 +5,7 @@ import type {
   StressProfile,
   StressSimulationRunRecord,
   StressTestTimelineResult,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { ApiError } from "../../lib/api/client.js";
 import { getStressTestDefinitions, getStressRunHistory, runStressTest } from "./api.js";
 import { initializeParameterValues, resetParameterValues, setParameterValue, type StressParameterValues } from "./parameterState.js";

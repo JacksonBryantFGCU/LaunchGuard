@@ -1,4 +1,4 @@
-import type { ArchitectureRecommendation } from "@redline/shared";
+import type { ArchitectureRecommendation } from "@purgatory/shared";
 import { RECOMMENDATION_LABELS } from "../../features/architecture-review/recommendationLabels.js";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { RedlineSchema, type RedlineTargetType } from "@redline/shared";
+import { RedlineSchema, type RedlineTargetType } from "@purgatory/shared";
 import type { RedlineDraft } from "./reviewState.js";
 
 export interface RedlineFormInput {

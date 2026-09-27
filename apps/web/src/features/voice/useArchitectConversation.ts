@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useConversation } from "@elevenlabs/react";
-import type { VoiceSessionFocus } from "@redline/shared";
+import type { VoiceSessionFocus } from "@purgatory/shared";
 import { useReviewState } from "../architecture-review/reviewStateStore.js";
 import { isReviewLocked } from "../architecture-review/reviewState.js";
 import { createVoiceSession } from "./api.js";
 import { normalizeMessageEvent } from "./transcriptNormalization.js";
 
 /**
- * Wires @elevenlabs/react's useConversation to Redline's review-state
+ * Wires @elevenlabs/react's useConversation to Purgatory's review-state
  * reducer. All voice/call state lives in ReviewState (single source of
  * truth) - this hook only translates SDK events into dispatches and back.
  * Must be rendered under a <ConversationProvider>.

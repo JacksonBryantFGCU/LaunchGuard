@@ -12,7 +12,7 @@ import {
   type AddPracticeEvidenceRequest,
   type ScenarioEvaluationResult,
   type PracticeScenarioStatus,
-} from "@redline/shared";
+} from "@purgatory/shared";
 import { apiGet, apiPost, apiPatch, apiPut, apiDelete } from "../../lib/api/client.js";
 
 const parseView = (data: unknown) => PracticeScenarioAttemptViewSchema.parse(data);

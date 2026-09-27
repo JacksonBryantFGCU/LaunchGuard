@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { getInternalScenarioBySlug } from "@redline/scenarios/internal";
+import { getInternalScenarioBySlug } from "@purgatory/scenarios/internal";
 import { buildArchitectConversationContext, buildStressLabFocusVariables } from "./architectContextService.js";
 
 const scenario = getInternalScenarioBySlug("black-friday-checkout")!;

@@ -1,4 +1,4 @@
-import type { ArchitectureModification, StressSimulationRunRecord } from "@redline/shared";
+import type { ArchitectureModification, StressSimulationRunRecord } from "@purgatory/shared";
 
 export function groupRunsByTest(runs: StressSimulationRunRecord[]): Record<string, StressSimulationRunRecord[]> {
   const grouped: Record<string, StressSimulationRunRecord[]> = {};

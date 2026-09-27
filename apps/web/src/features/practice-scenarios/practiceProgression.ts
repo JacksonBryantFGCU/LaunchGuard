@@ -1,4 +1,4 @@
-import type { PracticeScenario, PracticeScenarioAttemptSummary } from "@redline/shared";
+import type { PracticeScenario, PracticeScenarioAttemptSummary } from "@purgatory/shared";
 
 export type ScenarioDisplayStatus = "locked" | "available" | "in_progress" | "completed";
 

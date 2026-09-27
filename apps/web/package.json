@@ -14,7 +14,7 @@
   "dependencies": {
     "@clerk/react": "^6.17.2",
     "@elevenlabs/react": "^1.15.2",
-    "@redline/shared": "workspace:*",
+    "@purgatory/shared": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
     "@xyflow/react": "^12.8.7",
     "react": "^19.2.8",

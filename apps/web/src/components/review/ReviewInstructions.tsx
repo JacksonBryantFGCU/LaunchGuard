@@ -1,4 +1,4 @@
-import type { PublicArchitectureScenario } from "@redline/shared";
+import type { PublicArchitectureScenario } from "@purgatory/shared";
 
 interface ReviewInstructionsProps {
   scenario: PublicArchitectureScenario;

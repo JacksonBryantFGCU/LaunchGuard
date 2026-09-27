@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import type { ArchitectureNodeCategory, NodeEffectState } from "@redline/shared";
+import type { ArchitectureNodeCategory, NodeEffectState } from "@purgatory/shared";
 import { NODE_CATEGORY_LABELS } from "../../features/scenarios/labels.js";
 
 const CATEGORY_BORDER: Record<ArchitectureNodeCategory, string> = {

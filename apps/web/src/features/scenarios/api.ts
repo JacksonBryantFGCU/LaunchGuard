@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ArchitectureScenarioPreviewSchema, PublicArchitectureScenarioSchema } from "@redline/shared";
+import { ArchitectureScenarioPreviewSchema, PublicArchitectureScenarioSchema } from "@purgatory/shared";
 import { apiGet } from "../../lib/api/client.js";
 
 export function getScenarioPreviews() {

@@ -1,4 +1,4 @@
-import type { ArchitectureRecommendation } from "@redline/shared";
+import type { ArchitectureRecommendation } from "@purgatory/shared";
 import {
   RECOMMENDATION_DESCRIPTIONS,
   RECOMMENDATION_LABELS,

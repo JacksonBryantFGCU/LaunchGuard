@@ -8,8 +8,8 @@ import type {
   StressParameterValues,
   StressTestCategory,
   StressTestTimelineResult,
-} from "@redline/shared";
-import { resolveActiveComponents } from "@redline/shared";
+} from "@purgatory/shared";
+import { resolveActiveComponents } from "@purgatory/shared";
 import {
   simulateArchitecture,
   computeNeededInstances,

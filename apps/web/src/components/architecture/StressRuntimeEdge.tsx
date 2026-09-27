@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BaseEdge, getSmoothStepPath, type EdgeProps, type Edge } from "@xyflow/react";
-import type { EdgeEffectState } from "@redline/shared";
+import type { EdgeEffectState } from "@purgatory/shared";
 
 // Animated request-flow overlay (spec #48/#49): a small packet dot travels
 // the edge path via SVG <animateMotion>, with speed/opacity mapping to edge

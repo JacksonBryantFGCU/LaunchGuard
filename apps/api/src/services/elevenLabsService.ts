@@ -19,7 +19,7 @@ interface CreateSignedUrlResult {
   signedUrl: string;
 }
 
-// Talks to ElevenLabs only. Knows nothing about Redline scenarios - it just
+// Talks to ElevenLabs only. Knows nothing about Purgatory scenarios - it just
 // exchanges an API key + agent ID for a short-lived signed websocket URL, so
 // the API key never has to reach the browser.
 //

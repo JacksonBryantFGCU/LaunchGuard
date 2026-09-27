@@ -1,4 +1,4 @@
-import type { PublicArchitectureScenario, VoiceSessionFocus } from "@redline/shared";
+import type { PublicArchitectureScenario, VoiceSessionFocus } from "@purgatory/shared";
 import { useArchitectConversation } from "../../features/voice/useArchitectConversation.js";
 import { CallControls } from "../voice/CallControls.js";
 import { ConversationTranscript } from "../voice/ConversationTranscript.js";

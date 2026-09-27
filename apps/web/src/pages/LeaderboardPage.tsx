@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { LeaderboardEntryRow, PracticeScenario } from "@redline/shared";
+import type { LeaderboardEntryRow, PracticeScenario } from "@purgatory/shared";
 import { getOverallLeaderboard, getScenarioLeaderboard, getLeaderboardProfile, updateLeaderboardProfile } from "../features/leaderboard/api.js";
 import { listPracticeScenarios } from "../features/practice-scenarios/api.js";
 import { ApiError } from "../lib/api/client.js";
@@ -113,7 +113,7 @@ export function LeaderboardPage() {
         <div className="mt-8 rounded-lg border border-slate-800 bg-slate-900 p-6">
           <h2 className="text-sm font-medium text-slate-100">Join the leaderboard</h2>
           <p className="mt-1 text-xs text-slate-400">
-            Choose a display name to publish your practice scores inside Redline. Your email is never shown, and you can leave at any
+            Choose a display name to publish your practice scores inside Purgatory. Your email is never shown, and you can leave at any
             time.
           </p>
           <div className="mt-4 flex gap-2">

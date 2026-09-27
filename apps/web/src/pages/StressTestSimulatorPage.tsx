@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
-import type { StressTestReveal } from "@redline/shared";
+import type { StressTestReveal } from "@purgatory/shared";
 import { useReviewState } from "../features/architecture-review/reviewStateStore.js";
 import { useSelection } from "../features/architecture-review/useSelection.js";
 import { getStressTests } from "../features/stress-test/api.js";
@@ -177,7 +177,7 @@ export function StressTestSimulatorPage() {
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col">
       <header className="border-b border-slate-800 px-4 py-3">
-        <h1 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Redline &middot; Architecture Stress Test</h1>
+        <h1 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Purgatory &middot; Architecture Stress Test</h1>
         <p className="text-xs text-slate-500">
           {scenario.title} &middot; {scenario.reviewCode}
         </p>

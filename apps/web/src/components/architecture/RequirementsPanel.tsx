@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PublicArchitectureScenario } from "@redline/shared";
+import type { PublicArchitectureScenario } from "@purgatory/shared";
 import { Badge } from "../ui/Badge.js";
 import { DIFFICULTY_LABELS, FOCUS_LABELS } from "../../features/scenarios/labels.js";
 

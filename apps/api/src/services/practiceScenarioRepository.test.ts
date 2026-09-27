@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { ScenarioEvaluationResult } from "@redline/shared";
+import type { ScenarioEvaluationResult } from "@purgatory/shared";
 import { InMemoryPracticeScenarioRepository, AttemptLockedError, type NewStressSimulationRunInput } from "./practiceScenarioRepository.js";
 
 const SESSION_A = "session-a";

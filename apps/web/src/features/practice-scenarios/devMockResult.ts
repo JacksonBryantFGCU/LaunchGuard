@@ -1,4 +1,4 @@
-import type { PracticeResponseDraft, ScenarioEvaluationResult } from "@redline/shared";
+import type { PracticeResponseDraft, ScenarioEvaluationResult } from "@purgatory/shared";
 
 // Dev-only shortcut (spec: preview the scoring page without a full
 // investigation -> Stress Lab -> submission run each time) - never

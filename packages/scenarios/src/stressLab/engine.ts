@@ -2,8 +2,8 @@ import type {
   ArchitectureModification,
   ArchitectureSimulationResult,
   StressParameterValues,
-} from "@redline/shared";
-import { resolveActiveComponents } from "@redline/shared";
+} from "@purgatory/shared";
+import { resolveActiveComponents } from "@purgatory/shared";
 import { nonlinearUtilizationMultiplier } from "./latencyCurve.js";
 import { estimateConcurrency } from "./concurrency.js";
 import { amplifyDemandWithRetries, type RetryBackoff } from "./retryAmplification.js";

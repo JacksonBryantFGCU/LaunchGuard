@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useParams, useSearchParams } from "react-router-dom";
-import type { PublicArchitectureScenario } from "@redline/shared";
+import type { PublicArchitectureScenario } from "@purgatory/shared";
 import { getScenarioBySlug } from "../features/scenarios/api.js";
 import { ApiError } from "../lib/api/client.js";
 import { ReviewStateProvider } from "../features/architecture-review/ReviewStateContext.js";

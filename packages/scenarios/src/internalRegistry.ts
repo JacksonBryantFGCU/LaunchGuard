@@ -1,4 +1,4 @@
-import type { ArchitectureModification, InterventionDefinition, StressParameterValues, StressProfile, StressTestTimelineResult } from "@redline/shared";
+import type { ArchitectureModification, InterventionDefinition, StressParameterValues, StressProfile, StressTestTimelineResult } from "@purgatory/shared";
 import type { InternalArchitectureScenario } from "./internalScenario.js";
 import { blackFridayCheckoutInternalScenario } from "./black-friday-checkout/internal.js";
 import { getInternalPracticeScenarioById } from "./internalPracticeScenarioRegistry.js";
@@ -82,7 +82,7 @@ const internalScenariosBySlug = new Map<string, InternalArchitectureScenario>([
 /**
  * Private scenario truth (architect context, hidden risks, stress tests,
  * evaluation rubric). Deliberately not exported from this package's main
- * entry point - import from "@redline/scenarios/internal" only where
+ * entry point - import from "@purgatory/scenarios/internal" only where
  * private access is genuinely required (e.g. building architect
  * conversation context for voice). Never forward the return value to the
  * frontend; project it first.

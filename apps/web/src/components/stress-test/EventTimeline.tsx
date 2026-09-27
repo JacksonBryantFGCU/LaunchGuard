@@ -1,4 +1,4 @@
-import type { StressTestReveal } from "@redline/shared";
+import type { StressTestReveal } from "@purgatory/shared";
 
 export function EventTimeline({
   test,

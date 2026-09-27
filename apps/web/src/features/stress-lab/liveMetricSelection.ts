@@ -1,4 +1,4 @@
-import type { StressTestCategory } from "@redline/shared";
+import type { StressTestCategory } from "@purgatory/shared";
 
 // Only the systemMetrics keys the engine actually emits (engine.ts) - never
 // a fabricated provider-specific metric. Ordered most-relevant-first, capped

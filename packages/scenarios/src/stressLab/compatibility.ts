@@ -1,4 +1,4 @@
-import type { InterventionDefinition, InterventionTarget } from "@redline/shared";
+import type { InterventionDefinition, InterventionTarget } from "@purgatory/shared";
 
 // Prevents nonsensical placement (spec #19): a modification is only valid if
 // it matches one of the intervention's authored targets exactly.

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PracticeScenarioSchema, ScenarioSeveritySchema, type PracticeScenario } from "@redline/shared";
+import { PracticeScenarioSchema, ScenarioSeveritySchema, type PracticeScenario } from "@purgatory/shared";
 
 // Private practice-scenario truth. Never exported through this package's
 // public index.ts, and never sent to the API/frontend before submission -
