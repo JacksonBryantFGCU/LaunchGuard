@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { SimulationFrame } from "@redline/shared";
-import { mapFrameToNodeStates, mapFrameToEdgeStates } from "./runtimeMapping.js";
+import { mapFrameToNodeStates, mapFrameToEdgeStates, mapFrameToNodeMetrics } from "./runtimeMapping.js";
 
 const frame: SimulationFrame = {
   timestampSeconds: 30,
@@ -31,6 +31,12 @@ test("mapFrameToEdgeStates returns the frame's state keyed by edgeId for known b
   const result = mapFrameToEdgeStates(frame, ["checkout-service-postgres", "api-gateway-checkout-service"]);
   assert.equal(result["checkout-service-postgres"], "backlogged");
   assert.equal(result["api-gateway-checkout-service"], null);
+});
+
+test("mapFrameToNodeMetrics returns each known node's runtime metrics, omitting nodes the frame has none for", () => {
+  const result = mapFrameToNodeMetrics(frame, ["postgres", "checkout-service"]);
+  assert.deepEqual(result.postgres, { Connections: "500/500" });
+  assert.equal(result["checkout-service"], undefined);
 });
 
 test("mapping does not mutate the input frame", () => {

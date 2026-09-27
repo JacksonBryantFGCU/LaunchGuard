@@ -18,12 +18,16 @@ import { ConnectionInspector } from "../components/architecture/ConnectionInspec
 import { ArchitectPanel } from "../components/architecture/ArchitectPanel.js";
 import { ApiError } from "../lib/api/client.js";
 import type { PracticeScenarioOutletContext } from "./PracticeScenarioLayout.js";
+import { useStressLabTabState } from "../features/stress-lab/useStressLabTabState.js";
+import { StressLabTab as StressLabTabView, type ArchitectFocusRequest } from "../features/stress-lab/StressLabTab.js";
+import { suggestedQuestionsForFocus } from "../features/voice/architectContext.js";
 
 const TAB_LABELS: Record<ResourceTab, string> = {
   overview: "Overview",
   metrics: "Metrics & Evidence",
   requirements: "Requirements",
   architecture: "Architecture",
+  "stress-lab": "Stress Lab",
   architect: "Ask Architect",
   response: "Your Response",
 };
@@ -32,9 +36,17 @@ const SEVERITIES: ScenarioSeverity[] = ["low", "medium", "high", "critical"];
 const CONFIDENCES: ScenarioConfidence[] = ["low", "medium", "high"];
 
 export function PracticeInvestigationPage() {
-  const { system, practiceScenario } = useOutletContext<PracticeScenarioOutletContext>();
+  const { system, practiceScenario, reviewSessionId } = useOutletContext<PracticeScenarioOutletContext>();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = resolveResourceTab(searchParams.get("tab"));
+
+  // Lifted to the page level (not the "stress-lab" tab's own render) so
+  // switching to Architecture/Requirements/Ask Architect/Your Response and
+  // back never loses the selected test, parameters, design modifications,
+  // or completed runs (spec #17) - the tab is just conditionally rendered,
+  // not unmounted.
+  const stressLabState = useStressLabTabState(reviewSessionId, practiceScenario.id);
+  const [architectFocus, setArchitectFocus] = useState<ArchitectFocusRequest | undefined>(undefined);
 
   function setTab(next: ResourceTab) {
     setSearchParams((prev) => {
@@ -42,6 +54,11 @@ export function PracticeInvestigationPage() {
       params.set("tab", next);
       return params;
     });
+  }
+
+  function askArchitect(focus: ArchitectFocusRequest) {
+    setArchitectFocus(focus);
+    setTab("architect");
   }
 
   return (
@@ -75,7 +92,12 @@ export function PracticeInvestigationPage() {
         {tab === "metrics" && <MetricsTab system={system} />}
         {tab === "requirements" && <RequirementsTab system={system} />}
         {tab === "architecture" && <ArchitectureTab system={system} />}
-        {tab === "architect" && <ArchitectTab system={system} />}
+        {tab === "stress-lab" && (
+          <div className="h-full">
+            <StressLabTabView system={system} practiceScenario={practiceScenario} state={stressLabState} onAskArchitect={askArchitect} />
+          </div>
+        )}
+        {tab === "architect" && <ArchitectTab system={system} focus={architectFocus} onClearFocus={() => setArchitectFocus(undefined)} />}
         {tab === "response" && <ResponseTab />}
       </div>
     </div>
@@ -257,9 +279,26 @@ function ArchitectureTab({ system }: { system: PracticeScenarioOutletContext["sy
   );
 }
 
-function ArchitectTab({ system }: { system: PracticeScenarioOutletContext["system"] }) {
+function ArchitectTab({
+  system,
+  focus,
+  onClearFocus,
+}: {
+  system: PracticeScenarioOutletContext["system"];
+  focus?: ArchitectFocusRequest;
+  onClearFocus: () => void;
+}) {
   const { practiceScenario } = useOutletContext<PracticeScenarioOutletContext>();
   const { addEvidence } = usePracticeAttempt();
+
+  // Contextual entry point (spec #13/#15): a "this bottleneck"/"this
+  // component" focus carried over from Stress Lab replaces the generic
+  // investigation prompts with questions about that specific selection.
+  // Voice stays a tab (not a drawer) because the ElevenLabs conversation
+  // must fully unmount/remount through ConversationProvider - a drawer would
+  // require a second, always-mounted provider instance for no real benefit
+  // over carrying context here and letting the learner return to Stress Lab.
+  const suggestedQuestions = focus?.bottleneck ? suggestedQuestionsForFocus(focus.bottleneck) : practiceScenario.investigationPrompts;
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-8">
@@ -268,11 +307,21 @@ function ArchitectTab({ system }: { system: PracticeScenarioOutletContext["syste
         {system.architect.name} designed this system. Ask about assumptions, dependencies, scaling behavior, failure
         handling, or tradeoffs that aren't obvious from the available system information.
       </p>
+      <p className="mt-2 text-xs text-slate-500">Voice is entirely optional - you can complete this scenario without ever starting a conversation.</p>
+
+      {focus && (
+        <div className="mt-4 flex items-center justify-between gap-2 rounded-md border border-sky-800 bg-sky-950/30 px-3 py-2 text-xs text-sky-300">
+          <span>Focused on: {focus.focusLabel}</span>
+          <button type="button" onClick={onClearFocus} className="font-medium underline">
+            Clear
+          </button>
+        </div>
+      )}
 
       <div className="mt-4 rounded-md border border-slate-800 bg-slate-900 p-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Suggested questions</p>
         <ul className="mt-2 flex flex-col gap-1.5 text-sm text-slate-300">
-          {practiceScenario.investigationPrompts.map((prompt) => (
+          {suggestedQuestions.map((prompt) => (
             <li key={prompt}>{prompt}</li>
           ))}
         </ul>
@@ -280,7 +329,7 @@ function ArchitectTab({ system }: { system: PracticeScenarioOutletContext["syste
 
       <div className="mt-4">
         <ConversationProvider>
-          <ArchitectPanelWithEvidence system={system} onSaveLastTurn={addEvidence} />
+          <ArchitectPanelWithEvidence system={system} onSaveLastTurn={addEvidence} focus={focus} />
         </ConversationProvider>
       </div>
     </div>
@@ -290,14 +339,16 @@ function ArchitectTab({ system }: { system: PracticeScenarioOutletContext["syste
 function ArchitectPanelWithEvidence({
   system,
   onSaveLastTurn,
+  focus,
 }: {
   system: PracticeScenarioOutletContext["system"];
   onSaveLastTurn: ReturnType<typeof usePracticeAttempt>["addEvidence"];
+  focus?: ArchitectFocusRequest;
 }) {
   const { view } = usePracticeAttempt();
   return (
     <div className="flex flex-col gap-3">
-      <ArchitectPanel scenario={system} locked={false} />
+      <ArchitectPanel scenario={system} locked={false} focus={focus?.context} focusLabel={focus?.focusLabel} />
       <SaveLastArchitectTurn system={system} onSave={onSaveLastTurn} locked={isResponseLocked(view.status)} />
     </div>
   );

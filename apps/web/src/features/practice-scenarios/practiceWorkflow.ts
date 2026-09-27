@@ -1,6 +1,6 @@
 import type { PracticeScenarioStatus } from "@redline/shared";
 
-export const RESOURCE_TABS = ["overview", "metrics", "requirements", "architecture", "architect", "response"] as const;
+export const RESOURCE_TABS = ["overview", "metrics", "requirements", "architecture", "stress-lab", "architect", "response"] as const;
 export type ResourceTab = (typeof RESOURCE_TABS)[number];
 
 /** Falls back to "overview" for anything not a known tab - never throws on a bad URL param. */

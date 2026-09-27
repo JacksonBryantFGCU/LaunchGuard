@@ -64,6 +64,30 @@ test("maps a provider failure to a safe error without leaking provider details",
   }
 });
 
+test("forwards the learner's selected Stress Lab focus into the dynamic variables", async () => {
+  const result = await createVoiceSession(
+    {
+      scenarioSlug: "black-friday-checkout",
+      focus: { focusLabel: "Postgres", bottleneckSummary: "Connections: 500/500 (threshold 500)" },
+    },
+    configuredDeps(),
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.result.dynamicVariables.stress_focus_component, "Postgres");
+    assert.equal(result.result.dynamicVariables.stress_focus_bottleneck, "Connections: 500/500 (threshold 500)");
+  }
+});
+
+test("omitted focus fields become empty strings, never undefined or missing keys", async () => {
+  const result = await createVoiceSession({ scenarioSlug: "black-friday-checkout" }, configuredDeps());
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.result.dynamicVariables.stress_focus_component, "");
+    assert.equal(result.result.dynamicVariables.stress_focus_requirement, "");
+  }
+});
+
 test("never includes the API key or hidden scenario truth in the response", async () => {
   const result = await createVoiceSession({ scenarioSlug: "black-friday-checkout" }, configuredDeps());
   assert.ok(result.ok);

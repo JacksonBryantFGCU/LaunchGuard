@@ -1,7 +1,7 @@
 import { VoiceSessionRequestSchema, VoiceSessionResponseSchema, type VoiceSessionResponse } from "@redline/shared";
 import { getInternalScenarioBySlug } from "@redline/scenarios/internal";
 import { createSignedUrl, ElevenLabsProviderError, type CreateSignedUrlInput } from "./elevenLabsService.js";
-import { buildArchitectConversationContext } from "./architectContextService.js";
+import { buildArchitectConversationContext, buildStressLabFocusVariables } from "./architectContextService.js";
 import { env } from "../config/env.js";
 import { logger } from "../logger.js";
 
@@ -53,7 +53,7 @@ export async function createVoiceSession(body: unknown, deps: VoiceSessionDeps =
   }
 
   try {
-    const dynamicVariables = buildArchitectConversationContext(scenario);
+    const dynamicVariables = { ...buildArchitectConversationContext(scenario), ...buildStressLabFocusVariables(parsed.data.focus) };
     const result = VoiceSessionResponseSchema.parse({
       signedUrl: signedUrl.signedUrl,
       dynamicVariables,

@@ -1,4 +1,5 @@
 import type { InternalArchitectureScenario } from "@redline/scenarios/internal";
+import type { VoiceSessionFocus } from "@redline/shared";
 
 function bulletList(items: string[]): string {
   return items.map((item) => `- ${item}`).join("\n");
@@ -63,5 +64,22 @@ export function buildArchitectConversationContext(scenario: InternalArchitecture
     architect_assumptions: bulletList(scenario.architectContext.assumptions),
     architect_rationale: bulletList(scenario.architectContext.rationale),
     architect_tradeoffs: bulletList(scenario.architectContext.knownTradeoffs),
+  };
+}
+
+/**
+ * Merges the learner's current Stress Lab focus (spec #14) into the
+ * dynamic-variable set. Only ever forwards the plain-text fields the
+ * frontend already sent - this function has no access to
+ * scenario.hiddenRisks/stressTests/evaluationRubric and cannot leak them.
+ * ElevenLabs requires every dynamic-variable value be a plain string, so an
+ * absent field becomes "" rather than being omitted (never invented text).
+ */
+export function buildStressLabFocusVariables(focus: VoiceSessionFocus | undefined): Record<string, string> {
+  return {
+    stress_focus_component: focus?.focusLabel ?? "",
+    stress_focus_bottleneck: focus?.bottleneckSummary ?? "",
+    stress_focus_requirement: focus?.requirementSummary ?? "",
+    stress_focus_metrics: focus?.metricsSummary ?? "",
   };
 }
