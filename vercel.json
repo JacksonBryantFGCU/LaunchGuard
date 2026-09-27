@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter web run build",
+  "buildCommand": "pnpm --filter web run build && node scripts/bundle-api.mjs",
   "outputDirectory": "apps/web/dist",
   "rewrites": [
     { "source": "/health", "destination": "/api" },
