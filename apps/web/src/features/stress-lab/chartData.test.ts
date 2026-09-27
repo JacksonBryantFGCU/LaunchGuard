@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { SimulationFrame } from "@redline/shared";
-import { framesToChartSeries, nearestFrameIndexForTime, flattenEvents } from "./chartData.js";
+import type { SimulationBottleneck } from "@redline/shared";
+import { framesToChartSeries, nearestFrameIndexForTime, flattenEvents, selectPrimaryChartKeys } from "./chartData.js";
 
 const frames: SimulationFrame[] = [
   {
@@ -51,6 +52,28 @@ test("nearestFrameIndexForTime finds the closest frame to a given simulated time
 test("nearestFrameIndexForTime clamps to the valid range", () => {
   assert.equal(nearestFrameIndexForTime(frames, -10), 0);
   assert.equal(nearestFrameIndexForTime(frames, 10000), 2);
+});
+
+test("selectPrimaryChartKeys puts the metric behind the worst bottleneck first", () => {
+  const bottlenecks: SimulationBottleneck[] = [
+    { targetType: "node", targetId: "postgres", metric: "totalConnections", observed: "500/500", threshold: "500", severity: "critical", explanation: "x" },
+  ];
+  const keys = selectPrimaryChartKeys(framesToChartSeries(frames), bottlenecks);
+  assert.equal(keys[0], "totalConnections");
+});
+
+test("selectPrimaryChartKeys falls back to whatever metrics are actually present when there is no bottleneck", () => {
+  const keys = selectPrimaryChartKeys(framesToChartSeries(frames), []);
+  assert.ok(keys.length > 0);
+  for (const key of keys) {
+    assert.ok(key in frames[0]!.systemMetrics, `${key} should be a real observed metric`);
+  }
+});
+
+test("selectPrimaryChartKeys never returns more than the requested max and never duplicates a key", () => {
+  const keys = selectPrimaryChartKeys(framesToChartSeries(frames), [], 2);
+  assert.equal(keys.length, 2);
+  assert.equal(new Set(keys).size, keys.length);
 });
 
 test("flattenEvents concatenates every frame's events in timestamp order without duplicating frames with none", () => {

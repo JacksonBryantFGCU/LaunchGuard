@@ -27,3 +27,24 @@ export function primaryBottleneck(bottlenecks: SimulationBottleneck[]): Simulati
     undefined,
   );
 }
+
+/**
+ * Best-available correlation between a requirement result and the bottleneck
+ * that likely caused it. The API's result shape has no structural link
+ * between the two (no shared id) - this only checks whether the bottleneck's
+ * targetId or metric name is textually mentioned in the requirement's own
+ * explanation/observedValue text, which the simulation already authored.
+ * Returns undefined rather than guessing when nothing matches; when several
+ * match, the highest-severity one wins (spec: never fabricate causality the
+ * API doesn't support).
+ */
+export function correlateRequirementBottleneck(
+  requirement: SimulationRequirementResult,
+  bottlenecks: SimulationBottleneck[],
+): SimulationBottleneck | undefined {
+  const haystack = `${requirement.explanation} ${requirement.observedValue ?? ""}`.toLowerCase();
+  const matches = bottlenecks.filter(
+    (b) => haystack.includes(b.targetId.toLowerCase()) || haystack.includes(b.metric.toLowerCase()),
+  );
+  return primaryBottleneck(matches);
+}
