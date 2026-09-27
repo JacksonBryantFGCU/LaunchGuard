@@ -44,6 +44,12 @@ interface ArchitectureCanvasProps {
   // simulator, so the ordinary review canvas is unaffected.
   nodeStressStates?: Record<string, NodeEffectState | null>;
   edgeStressStates?: Record<string, EdgeEffectState | null>;
+  // Stress Lab "dense" runtime mode (spec #4): bigger nodes/type plus up to
+  // a few real observed metrics per node, inline on the canvas rather than
+  // only in a side inspector. Absent (default) keeps the compact Architecture
+  // tab rendering unchanged.
+  dense?: boolean;
+  nodeRuntimeMetrics?: Record<string, Record<string, string>>;
 }
 
 export function ArchitectureCanvas({
@@ -59,6 +65,8 @@ export function ArchitectureCanvas({
   redlineCountByEdgeId,
   nodeStressStates,
   edgeStressStates,
+  dense,
+  nodeRuntimeMetrics,
 }: ArchitectureCanvasProps) {
   const flowNodes: Node[] = useMemo(
     () =>
@@ -76,6 +84,8 @@ export function ArchitectureCanvas({
             reviewed: reviewedNodeIds.has(node.id),
             redlineCount: redlineCountByNodeId[node.id] ?? 0,
             stressState,
+            dense,
+            runtimeMetrics: nodeRuntimeMetrics?.[node.id],
           },
           selected: selection?.kind === "node" && selection.id === node.id,
           draggable: false,
@@ -86,7 +96,7 @@ export function ArchitectureCanvas({
             : {}),
         };
       }),
-    [nodes, selection, reviewedNodeIds, redlineCountByNodeId, nodeStressStates],
+    [nodes, selection, reviewedNodeIds, redlineCountByNodeId, nodeStressStates, dense, nodeRuntimeMetrics],
   );
 
   const flowEdges: Edge[] = useMemo(

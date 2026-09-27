@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "./AppLayout.js";
 import { ProtectedRoute } from "./ProtectedRoute.js";
 import { LandingPage } from "../pages/LandingPage.js";
@@ -16,7 +16,6 @@ import { PracticeOverviewPage } from "../pages/PracticeOverviewPage.js";
 import { PracticeScenarioLayout } from "../pages/PracticeScenarioLayout.js";
 import { PracticeScenarioBriefPage } from "../pages/PracticeScenarioBriefPage.js";
 import { PracticeInvestigationPage } from "../pages/PracticeInvestigationPage.js";
-import { StressLabPage } from "../pages/StressLabPage.js";
 import { PracticeResultPage } from "../pages/PracticeResultPage.js";
 import { NotFoundPage } from "../pages/NotFoundPage.js";
 
@@ -44,7 +43,13 @@ export const router = createBrowserRouter([
                 children: [
                   { index: true, element: <PracticeScenarioBriefPage /> },
                   { path: "investigate", element: <PracticeInvestigationPage /> },
-                  { path: "stress-lab", element: <StressLabPage /> },
+                  {
+                    // Stress Lab is now a tab within the investigation
+                    // workspace (spec #1), not a separate page - this
+                    // redirect keeps old links/history entries working.
+                    path: "stress-lab",
+                    element: <Navigate to={{ pathname: "../investigate", search: "?tab=stress-lab" }} replace />,
+                  },
                   { path: "result", element: <PracticeResultPage /> },
                 ],
               },

@@ -38,25 +38,36 @@ type ArchitectureNodeData = {
   reviewed: boolean;
   redlineCount: number;
   stressState?: NodeEffectState | null;
+  // Stress Lab "dense" runtime display (spec #4): larger node, bigger type,
+  // and up to a handful of the metrics that are actually meaningful for this
+  // node's type (never a uniform set across every node - a node with no
+  // metrics this frame just shows none).
+  dense?: boolean;
+  runtimeMetrics?: Record<string, string>;
 };
 
 type ArchitectureFlowNode = Node<ArchitectureNodeData, "architecture">;
 
+const MAX_DENSE_METRICS = 4;
+
 export function ArchitectureNodeView({ data, selected }: NodeProps<ArchitectureFlowNode>) {
   const stressRing = data.stressState ? STRESS_STATE_RING[data.stressState] : undefined;
+  const dense = data.dense ?? false;
+  const metricEntries = dense && data.runtimeMetrics ? Object.entries(data.runtimeMetrics).slice(0, MAX_DENSE_METRICS) : [];
+
   return (
     <div
       role="button"
       tabIndex={0}
       aria-pressed={selected}
-      className={`w-48 rounded-md border bg-slate-900 px-3 py-2 text-left shadow-sm transition-shadow ${CATEGORY_BORDER[data.category]} ${
+      className={`rounded-md border bg-slate-900 text-left shadow-sm transition-shadow ${dense ? "w-64 px-4 py-3" : "w-48 px-3 py-2"} ${CATEGORY_BORDER[data.category]} ${
         selected ? "ring-2 ring-sky-400" : (stressRing ?? "")
       }`}
     >
       <Handle type="target" position={Position.Left} className="!h-2 !w-2 !bg-slate-600" />
       <Handle type="source" position={Position.Right} className="!h-2 !w-2 !bg-slate-600" />
       <div className="flex items-start justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+        <p className={`font-semibold uppercase tracking-wide text-slate-500 ${dense ? "text-xs" : "text-[10px]"}`}>
           {NODE_CATEGORY_LABELS[data.category]}
         </p>
         {data.redlineCount > 0 && (
@@ -68,11 +79,21 @@ export function ArchitectureNodeView({ data, selected }: NodeProps<ArchitectureF
           </span>
         )}
       </div>
-      <p className="mt-0.5 text-sm font-medium text-slate-100">{data.label}</p>
-      <p className="mt-0.5 truncate text-xs text-slate-400">{data.summary}</p>
+      <p className={`mt-0.5 font-medium text-slate-100 ${dense ? "text-base" : "text-sm"}`}>{data.label}</p>
+      {!dense && <p className="mt-0.5 truncate text-xs text-slate-400">{data.summary}</p>}
       {data.reviewed && <p className="mt-1 text-[10px] font-medium text-emerald-400">✓ Reviewed</p>}
       {data.stressState && data.stressState !== "normal" && (
-        <p className="mt-1 text-[10px] font-semibold text-amber-400">{STRESS_STATE_LABEL[data.stressState]}</p>
+        <p className={`mt-1 font-semibold text-amber-400 ${dense ? "text-xs" : "text-[10px]"}`}>{STRESS_STATE_LABEL[data.stressState]}</p>
+      )}
+      {metricEntries.length > 0 && (
+        <dl className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 border-t border-slate-800 pt-2">
+          {metricEntries.map(([key, value]) => (
+            <div key={key} className="min-w-0">
+              <dt className="truncate text-[10px] uppercase tracking-wide text-slate-500">{key}</dt>
+              <dd className="truncate font-mono text-xs text-slate-200">{value}</dd>
+            </div>
+          ))}
+        </dl>
       )}
     </div>
   );

@@ -10,14 +10,19 @@ interface TimeSeriesChartProps {
   color: string;
   currentTimeSeconds: number;
   onScrub: (seconds: number) => void;
+  // True when a selected requirement/bottleneck correlates to this metric
+  // (spec #3) - a visual focus ring, never invented when there's no
+  // structural link.
+  highlighted?: boolean;
 }
 
-function TimeSeriesChartImpl({ data, dataKey, label, unit, color, currentTimeSeconds, onScrub }: TimeSeriesChartProps) {
+function TimeSeriesChartImpl({ data, dataKey, label, unit, color, currentTimeSeconds, onScrub, highlighted }: TimeSeriesChartProps) {
   return (
-    <div className="rounded-md border border-slate-800 bg-slate-900 p-2">
+    <div className={`rounded-md border bg-slate-900 p-2 transition-colors ${highlighted ? "border-sky-500 ring-1 ring-sky-500" : "border-slate-800"}`}>
       <p className="px-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
         {label}
         {unit ? ` (${unit})` : ""}
+        {highlighted && <span className="ml-1 text-sky-400">(focused)</span>}
       </p>
       <div className="h-28 w-full">
         <ResponsiveContainer width="100%" height="100%">

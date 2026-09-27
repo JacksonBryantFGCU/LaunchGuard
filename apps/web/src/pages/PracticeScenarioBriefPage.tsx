@@ -57,7 +57,7 @@ export function PracticeScenarioBriefPage() {
         </button>
         <button
           type="button"
-          onClick={() => navigate(`${basePath}/stress-lab`)}
+          onClick={() => navigate(`${basePath}/investigate?tab=stress-lab`)}
           className="inline-flex items-center rounded-md border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 hover:border-slate-500"
         >
           Open Stress Lab

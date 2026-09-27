@@ -9,7 +9,7 @@ import {
 } from "./practiceWorkflow.js";
 
 test("resolveResourceTab accepts every known tab", () => {
-  for (const tab of ["overview", "metrics", "requirements", "architecture", "architect", "response"]) {
+  for (const tab of ["overview", "metrics", "requirements", "architecture", "stress-lab", "architect", "response"]) {
     assert.equal(resolveResourceTab(tab), tab);
   }
 });

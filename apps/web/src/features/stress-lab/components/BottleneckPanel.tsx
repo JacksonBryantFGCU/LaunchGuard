@@ -5,14 +5,16 @@ const SEVERITY_RANK: Record<SimulationBottleneck["severity"], number> = { low: 0
 export function BottleneckPanel({
   bottlenecks,
   onSelect,
+  title = "Bottlenecks",
 }: {
   bottlenecks: SimulationBottleneck[];
   onSelect: (targetType: "node" | "edge", targetId: string) => void;
+  title?: string;
 }) {
   if (bottlenecks.length === 0) {
     return (
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bottlenecks</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</h3>
         <p className="mt-2 text-xs text-slate-500">No bottlenecks observed at this point in the run.</p>
       </div>
     );
@@ -21,7 +23,7 @@ export function BottleneckPanel({
   const ranked = [...bottlenecks].sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]);
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bottlenecks</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</h3>
       <ol className="mt-2 flex flex-col gap-2">
         {ranked.map((b, i) => (
           <li key={`${b.targetType}-${b.targetId}-${b.metric}`}>
