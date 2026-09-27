@@ -28,10 +28,6 @@ coverage/
 # Vite
 apps/web/dist/
 
-# Generated Vercel function bundle
-api/index.js
-api/index.js.map
-
 # Temporary/scratch data
 .tmp/
 tmp/

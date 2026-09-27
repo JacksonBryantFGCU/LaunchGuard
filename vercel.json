@@ -1,9 +1,3 @@
 {
-  "buildCommand": "pnpm --filter web run build && node scripts/bundle-api.mjs",
-  "outputDirectory": "apps/web/dist",
-  "rewrites": [
-    { "source": "/health", "destination": "/api" },
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/((?!api/|health).*)", "destination": "/index.html" }
-  ]
+  "buildCommand": "node scripts/build-vercel-output.mjs"
 }
