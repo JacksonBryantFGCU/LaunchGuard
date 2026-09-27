@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useConversation } from "@elevenlabs/react";
+import type { VoiceSessionFocus } from "@redline/shared";
 import { useReviewState } from "../architecture-review/reviewStateStore.js";
 import { isReviewLocked } from "../architecture-review/reviewState.js";
 import { createVoiceSession } from "./api.js";
@@ -10,13 +11,23 @@ import { normalizeMessageEvent } from "./transcriptNormalization.js";
  * reducer. All voice/call state lives in ReviewState (single source of
  * truth) - this hook only translates SDK events into dispatches and back.
  * Must be rendered under a <ConversationProvider>.
+ *
+ * `focus` is the learner's current Stress Lab selection (component/edge/
+ * bottleneck/requirement, all already-visible text) - forwarded as-is to
+ * the voice-session request so Alex can be asked about it contextually
+ * (spec #14). Read fresh at call time via a ref so a later selection change
+ * doesn't require restarting an in-progress `start` call.
  */
-export function useArchitectConversation(scenarioSlug: string) {
+export function useArchitectConversation(scenarioSlug: string, focus?: VoiceSessionFocus) {
   const { state, dispatch } = useReviewState();
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+  const focusRef = useRef(focus);
+  useEffect(() => {
+    focusRef.current = focus;
+  }, [focus]);
 
   const conversation = useConversation({
     onConnect: ({ conversationId }) => {
@@ -53,7 +64,7 @@ export function useArchitectConversation(scenarioSlug: string) {
     }
 
     try {
-      const session = await createVoiceSession(scenarioSlug);
+      const session = await createVoiceSession(scenarioSlug, focusRef.current);
       conversation.startSession({
         signedUrl: session.signedUrl,
         connectionType: "websocket",

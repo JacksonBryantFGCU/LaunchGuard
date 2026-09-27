@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { getInternalScenarioBySlug } from "@redline/scenarios/internal";
-import { buildArchitectConversationContext } from "./architectContextService.js";
+import { buildArchitectConversationContext, buildStressLabFocusVariables } from "./architectContextService.js";
 
 const scenario = getInternalScenarioBySlug("black-friday-checkout")!;
 const context = buildArchitectConversationContext(scenario);
@@ -79,4 +79,18 @@ test("excludes the evaluation rubric entirely", () => {
 test("does not expose a correct recommendation", () => {
   assert.equal((context as Record<string, unknown>).recommendation, undefined);
   assert.equal((context as Record<string, unknown>).correctRecommendation, undefined);
+});
+
+test("buildStressLabFocusVariables forwards only the provided focus fields as plain strings", () => {
+  const vars = buildStressLabFocusVariables({ focusLabel: "Postgres", bottleneckSummary: "Connections: 500/500" });
+  assert.equal(vars.stress_focus_component, "Postgres");
+  assert.equal(vars.stress_focus_bottleneck, "Connections: 500/500");
+  assert.equal(vars.stress_focus_requirement, "");
+});
+
+test("buildStressLabFocusVariables is all empty strings, never undefined, when nothing was selected", () => {
+  const vars = buildStressLabFocusVariables(undefined);
+  for (const value of Object.values(vars)) {
+    assert.equal(typeof value, "string");
+  }
 });
