@@ -19,7 +19,7 @@ export function ImpactPanel({
 }) {
   if (!test) {
     return (
-      <aside className="overflow-y-auto border-l border-slate-800 p-4 text-xs text-slate-500">
+      <aside className="scroll-panel overflow-y-auto border-l border-slate-800 p-4 text-xs text-slate-500">
         Impact details appear here once a test is running.
       </aside>
     );
@@ -28,7 +28,7 @@ export function ImpactPanel({
   const requirementLabel = (id: string) => scenario.requirements.find((r) => r.id === id)?.summary ?? id;
 
   return (
-    <aside className="flex flex-col gap-4 overflow-y-auto border-l border-slate-800 p-4">
+    <aside className="scroll-panel flex flex-col gap-4 overflow-y-auto border-l border-slate-800 p-4">
       <div>
         <h2 className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Trigger</h2>
         <p className="mt-1 text-xs text-slate-300">{test.trigger}</p>

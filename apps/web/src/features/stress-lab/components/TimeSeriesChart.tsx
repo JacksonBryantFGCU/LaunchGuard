@@ -24,7 +24,7 @@ function TimeSeriesChartImpl({ data, dataKey, label, unit, color, currentTimeSec
         {unit ? ` (${unit})` : ""}
         {highlighted && <span className="ml-1 text-sky-400">(focused)</span>}
       </p>
-      <div className="h-28 w-full">
+      <div className="h-24 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}

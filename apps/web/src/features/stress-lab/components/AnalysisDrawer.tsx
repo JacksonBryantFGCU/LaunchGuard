@@ -63,7 +63,7 @@ export function AnalysisDrawer({
   }
 
   return (
-    <div className="scroll-panel max-h-[35vh] overflow-y-auto border-t border-slate-800 p-4">
+    <div className="scroll-panel max-h-[30vh] shrink-0 overflow-y-auto border-t border-slate-800 p-3">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">System Analysis</h3>
         <button type="button" onClick={() => setExpanded(false)} className="text-xs font-medium text-sky-400 hover:text-sky-300">
@@ -71,7 +71,7 @@ export function AnalysisDrawer({
         </button>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
         {primaryChartKeys.map((key, i) => (
           <TimeSeriesChart
             key={key}
@@ -86,7 +86,7 @@ export function AnalysisDrawer({
         ))}
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-4">
           {comparison && <ComparisonPanel baseline={comparison.baseline} current={comparison.current} isStrict={comparison.isStrict} />}
           {runs.length > 0 && <RunHistoryPanel runs={runs} activeRunId={activeRunId} onSelect={onSelectRun} />}

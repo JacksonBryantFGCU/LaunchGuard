@@ -27,7 +27,7 @@ export function StressTestList({
   onSelect: (testId: string) => void;
 }) {
   return (
-    <nav aria-label="Stress tests" className="flex flex-col gap-1 overflow-y-auto border-r border-slate-800 p-3">
+    <nav aria-label="Stress tests" className="scroll-panel flex flex-col gap-1 overflow-y-auto border-r border-slate-800 p-3">
       <h2 className="px-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Tests</h2>
       {tests.map((test) => {
         const status = statuses[test.id] ?? "not_started";

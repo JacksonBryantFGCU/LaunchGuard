@@ -158,7 +158,7 @@ export function ArchitectureWorkspace({ scenario }: { scenario: PublicArchitectu
             ))}
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-900 p-4">
+          <div className="scroll-panel min-h-0 flex-1 overflow-y-auto bg-slate-900 p-4">
             {composer && !locked ? (
               <RedlineComposer
                 targetType={composer.targetType}

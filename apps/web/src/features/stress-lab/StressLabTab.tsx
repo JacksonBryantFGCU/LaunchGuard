@@ -210,7 +210,7 @@ export function StressLabTab({
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-4 py-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Stress Lab &middot; {practiceScenario.title}</p>
@@ -335,8 +335,18 @@ export function StressLabTab({
             </div>
           )}
 
-          <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[7fr_3fr]">
-            <div className="min-h-[560px]">
+          {/*
+            React Flow requires an ancestor with a real (not min-) height to
+            size itself correctly - a min-h-only wrapper inside this flex
+            column let it mismeasure against the AnalysisDrawer sharing the
+            same column, so its "dense" nodes rendered past their column and
+            overlapped the sidebar/charts below. A fixed viewport-relative
+            height plus overflow-hidden gives it a stable box and stops
+            anything from spilling out of it even if a frame briefly
+            mismeasures.
+          */}
+          <div className="grid h-[48vh] min-h-[380px] grid-cols-1 overflow-hidden lg:grid-cols-[7fr_3fr]">
+            <div className="h-full overflow-hidden">
               <ArchitectureCanvas
                 nodes={system.nodes}
                 edges={system.edges}
@@ -355,7 +365,7 @@ export function StressLabTab({
               />
             </div>
             {/* During an active run, the sidebar is only Live System / Requirements / Primary Bottleneck (spec #5) - no generic filler copy. */}
-            <div className="scroll-panel flex flex-col gap-4 overflow-y-auto border-l border-slate-800 p-4">
+            <div className="scroll-panel flex h-full flex-col gap-4 overflow-y-auto border-l border-slate-800 p-4">
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Live System</h3>
                 <div className="mt-2">
@@ -470,17 +480,21 @@ function RunCompletionSummary({
   const counts = countRequirementStatuses(requirements);
   const bottleneck = primaryBottleneck(bottlenecks);
   return (
-    <div className={`rounded-lg border p-4 ${passed ? "border-emerald-900 bg-emerald-950/20" : "border-slate-800 bg-slate-900"}`}>
-      <p className="text-sm font-semibold text-slate-100">{passed ? "SYSTEM PASSES THIS TEST" : "DESIGN NEEDS WORK"}</p>
-      <p className="mt-1 text-xs text-slate-400">{formatRequirementScore(counts)} requirements satisfied</p>
-      {!passed && bottleneck && (
-        <p className="mt-1 text-xs text-slate-400">
-          Primary bottleneck: <span className="text-slate-200">{bottleneck.targetId}</span> ({bottleneck.metric})
+    <div className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 ${passed ? "border-emerald-900 bg-emerald-950/20" : "border-slate-800 bg-slate-900"}`}>
+      <div>
+        <p className="text-sm font-semibold text-slate-100">{passed ? "SYSTEM PASSES THIS TEST" : "DESIGN NEEDS WORK"}</p>
+        <p className="mt-0.5 text-xs text-slate-400">
+          {formatRequirementScore(counts)} requirements satisfied
+          {!passed && bottleneck && (
+            <>
+              {" · "}Primary bottleneck: <span className="text-slate-200">{bottleneck.targetId}</span> ({bottleneck.metric})
+            </>
+          )}
         </p>
-      )}
+      </div>
       {/* Re-run is the visually dominant action (spec #11) - it's the same conditions, one click, always available once a run exists. */}
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button type="button" onClick={onRerun} className="rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={onRerun} className="rounded-md bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-500">
           Re-run Same Test
         </button>
         <button type="button" onClick={onModify} className="rounded-md border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-slate-500">

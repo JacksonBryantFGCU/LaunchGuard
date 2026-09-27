@@ -14,7 +14,7 @@ export function ReviewInstructions({ scenario, onDismiss, dismissLabel }: Review
       aria-labelledby="review-instructions-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4"
     >
-      <div className="max-h-full w-full max-w-lg overflow-y-auto rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-xl">
+      <div className="scroll-panel max-h-full w-full max-w-lg overflow-y-auto rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-xl">
         <h2 id="review-instructions-title" className="text-base font-semibold text-slate-100">
           Architecture Review Brief
         </h2>

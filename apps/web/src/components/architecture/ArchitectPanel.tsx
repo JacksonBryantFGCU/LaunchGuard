@@ -42,7 +42,7 @@ export function ArchitectPanel({
         </div>
       </div>
 
-      <div className="max-h-64 overflow-y-auto border-t border-slate-800 p-4">
+      <div className="scroll-panel max-h-64 overflow-y-auto border-t border-slate-800 p-4">
         <ConversationTranscript transcript={transcript} architectName={scenario.architect.name} />
       </div>
     </div>
