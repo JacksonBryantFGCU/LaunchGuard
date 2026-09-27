@@ -6,6 +6,7 @@ import { SignInPage } from "../pages/SignInPage.js";
 import { SignUpPage } from "../pages/SignUpPage.js";
 import { ScenarioLibraryPage } from "../pages/ScenarioLibraryPage.js";
 import { ReviewHistoryPage } from "../pages/ReviewHistoryPage.js";
+import { LeaderboardPage } from "../pages/LeaderboardPage.js";
 import { ArchitectureReviewLayout } from "../pages/ArchitectureReviewLayout.js";
 import { ArchitectureReviewPage } from "../pages/ArchitectureReviewPage.js";
 import { ReviewSummaryPage } from "../pages/ReviewSummaryPage.js";
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <ScenarioLibraryPage /> },
           { path: "history", element: <ReviewHistoryPage /> },
+          { path: "leaderboard", element: <LeaderboardPage /> },
           {
             path: "practice/:systemSlug",
             element: <PracticeSystemLayout />,

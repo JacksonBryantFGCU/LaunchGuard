@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { InMemoryReviewRepository } from "./reviewRepository.js";
 import { InMemoryPracticeScenarioRepository } from "./practiceScenarioRepository.js";
+import { InMemoryLeaderboardRepository } from "./leaderboardRepository.js";
 import { startOrResumeSession, addTranscriptTurn } from "./reviewSessionService.js";
 import {
   getOrStartPracticeScenarioAttempt,
@@ -170,7 +171,14 @@ test("consequence-ready and completion progress after a submitted+evaluated atte
   assert.ok(consequenceReady.ok);
   if (consequenceReady.ok) assert.equal(consequenceReady.result.status, "consequence_ready");
 
-  const completed = await completePracticeScenarioAttempt(reviewRepo, practiceRepo, "user_a", sessionId, SCENARIO_ID);
+  const completed = await completePracticeScenarioAttempt(
+    reviewRepo,
+    practiceRepo,
+    new InMemoryLeaderboardRepository(),
+    "user_a",
+    sessionId,
+    SCENARIO_ID,
+  );
   assert.ok(completed.ok);
   if (completed.ok) assert.equal(completed.result.status, "completed");
 });

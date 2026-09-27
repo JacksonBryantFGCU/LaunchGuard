@@ -11,6 +11,7 @@ import { z } from "zod";
 import { getUserId } from "../middleware/auth.js";
 import type { ReviewRepository } from "../services/reviewRepository.js";
 import type { PracticeScenarioRepository } from "../services/practiceScenarioRepository.js";
+import type { LeaderboardRepository } from "../services/leaderboardRepository.js";
 import {
   getOrStartPracticeScenarioAttempt,
   getPracticeScenarioAttemptView,
@@ -55,6 +56,7 @@ const badRequest = (res: Response, error: string, message: string) => res.status
 export function createPracticeScenarioAttemptsRouter(
   reviewRepo: ReviewRepository,
   practiceRepo: PracticeScenarioRepository,
+  leaderboardRepo: LeaderboardRepository,
 ): Router {
   const router = Router({ mergeParams: true });
 
@@ -128,7 +130,10 @@ export function createPracticeScenarioAttemptsRouter(
 
   router.post("/:scenarioId/complete", async (req, res) => {
     const { reviewSessionId, scenarioId } = req.params as { reviewSessionId: string; scenarioId: string };
-    respond(res, await completePracticeScenarioAttempt(reviewRepo, practiceRepo, getUserId(req), reviewSessionId, scenarioId));
+    respond(
+      res,
+      await completePracticeScenarioAttempt(reviewRepo, practiceRepo, leaderboardRepo, getUserId(req), reviewSessionId, scenarioId),
+    );
   });
 
   router.get("/:scenarioId/stress-tests", async (req, res) => {

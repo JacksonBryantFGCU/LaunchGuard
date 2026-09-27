@@ -17,6 +17,9 @@ export function Header() {
           <Link to="/app/history" className="text-sm text-slate-400 hover:text-slate-100">
             History
           </Link>
+          <Link to="/app/leaderboard" className="text-sm text-slate-400 hover:text-slate-100">
+            Leaderboard
+          </Link>
         </div>
         <UserButton />
       </div>

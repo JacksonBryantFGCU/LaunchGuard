@@ -14,10 +14,13 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { requireAuth as defaultRequireAuth } from "./middleware/auth.js";
 import { createDefaultReviewRepository } from "./db/reviewRepositoryFactory.js";
 import { createDefaultPracticeScenarioRepository } from "./db/practiceScenarioRepositoryFactory.js";
+import { createDefaultLeaderboardRepository } from "./db/leaderboardRepositoryFactory.js";
 import type { ReviewRepository } from "./services/reviewRepository.js";
 import type { PracticeScenarioRepository } from "./services/practiceScenarioRepository.js";
+import type { LeaderboardRepository } from "./services/leaderboardRepository.js";
 import { practiceScenariosRouter } from "./routes/practiceScenarios.js";
 import { createPracticeScenarioAttemptsRouter } from "./routes/practiceScenarioAttempts.js";
+import { createLeaderboardRouter } from "./routes/leaderboard.js";
 
 export interface CreateAppOverrides {
   // Test-only seam: replaces requireAuth so tests never depend on Clerk's
@@ -28,6 +31,8 @@ export interface CreateAppOverrides {
   repository?: ReviewRepository;
   // Test-only seam: same idea as `repository`, for practice scenario persistence.
   practiceRepository?: PracticeScenarioRepository;
+  // Test-only seam: same idea as `repository`, for leaderboard persistence.
+  leaderboardRepository?: LeaderboardRepository;
 }
 
 export function createApp(overrides: CreateAppOverrides = {}) {
@@ -35,6 +40,7 @@ export function createApp(overrides: CreateAppOverrides = {}) {
   const requireAuth = overrides.requireAuth ?? defaultRequireAuth;
   const repository = overrides.repository ?? createDefaultReviewRepository();
   const practiceRepository = overrides.practiceRepository ?? createDefaultPracticeScenarioRepository();
+  const leaderboardRepository = overrides.leaderboardRepository ?? createDefaultLeaderboardRepository();
 
   app.use(helmet());
   app.use(cors({ origin: env.WEB_ORIGIN }));
@@ -53,10 +59,11 @@ export function createApp(overrides: CreateAppOverrides = {}) {
   app.use(
     "/api/review-sessions/:reviewSessionId/practice-scenarios",
     requireAuth,
-    createPracticeScenarioAttemptsRouter(repository, practiceRepository),
+    createPracticeScenarioAttemptsRouter(repository, practiceRepository, leaderboardRepository),
   );
   app.use("/api/reviews", requireAuth, createReviewsRouter(repository, practiceRepository));
   app.use("/api/voice", requireAuth, voiceRouter);
+  app.use("/api/leaderboard", requireAuth, createLeaderboardRouter(leaderboardRepository));
 
   app.use(errorHandler);
 

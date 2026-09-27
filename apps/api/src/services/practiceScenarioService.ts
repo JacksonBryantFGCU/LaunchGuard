@@ -15,6 +15,8 @@ import {
   type PracticeScenarioAttemptRecord,
   type PracticeScenarioRepository,
 } from "./practiceScenarioRepository.js";
+import type { LeaderboardRepository } from "./leaderboardRepository.js";
+import { recordScenarioCompletion } from "./leaderboardService.js";
 
 export type ServiceFailure = { ok: false; status: number; error: string; message: string };
 export type ServiceResult<T> = { ok: true; result: T } | ServiceFailure;
@@ -327,6 +329,7 @@ export async function markPracticeScenarioConsequenceReady(
 export async function completePracticeScenarioAttempt(
   reviewRepo: ReviewRepository,
   practiceRepo: PracticeScenarioRepository,
+  leaderboardRepo: LeaderboardRepository,
   userId: string,
   reviewSessionId: string,
   practiceScenarioId: string,
@@ -334,6 +337,22 @@ export async function completePracticeScenarioAttempt(
   const owned = await requireAttempt(reviewRepo, practiceRepo, userId, reviewSessionId, practiceScenarioId);
   if (!owned.ok) return owned;
   await practiceRepo.completePracticeScenario(owned.attempt.id);
+
+  // Best-effort: an attempt can reach completed without a result in
+  // principle (shouldn't normally happen), so this just skips recording
+  // rather than failing the completion.
+  const result = await practiceRepo.getPracticeScenarioResult(owned.attempt.id);
+  if (result) {
+    await recordScenarioCompletion(
+      leaderboardRepo,
+      userId,
+      practiceScenarioId,
+      owned.attempt.id,
+      result.objectiveScore,
+      result.objectiveMaxScore,
+    );
+  }
+
   const refreshed = await practiceRepo.getPracticeScenarioAttemptById(owned.attempt.id);
   return { ok: true, result: await toAttemptView(practiceRepo, refreshed ?? owned.attempt) };
 }
