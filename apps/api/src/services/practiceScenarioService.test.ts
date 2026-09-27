@@ -94,6 +94,30 @@ test("submitting a complete response succeeds and produces a deterministic resul
   assert.equal(stored?.objectiveScore, result.result.evaluation.objectiveScore);
 });
 
+test("resubmitting an already-submitted attempt (double-click, a retried request, ...) returns the existing result instead of erroring", async () => {
+  const { reviewRepo, practiceRepo, sessionId } = await setup();
+  const started = await getOrStartPracticeScenarioAttempt(reviewRepo, practiceRepo, "user_a", sessionId, SCENARIO_ID);
+  assert.ok(started.ok);
+  if (!started.ok) return;
+
+  await practiceRepo.savePracticeScenarioResponseDraft(started.result.id, {
+    diagnosis: "Checkout and Inventory both scale out against one Postgres connection limit.",
+    investigationPlan: "Compare connection counts against the configured limit.",
+    immediateAction: "Add a connection pooler in front of Postgres.",
+    architectureDecision: "Introduce a read replica and pooling layer.",
+    tradeoff: "Adds an operational component to run and monitor.",
+    severity: "high",
+  });
+
+  const first = await submitPracticeScenarioResponse(reviewRepo, practiceRepo, "user_a", sessionId, SCENARIO_ID);
+  const second = await submitPracticeScenarioResponse(reviewRepo, practiceRepo, "user_a", sessionId, SCENARIO_ID);
+  assert.ok(first.ok && second.ok);
+  if (!first.ok || !second.ok) return;
+
+  assert.deepEqual(second.result.evaluation, first.result.evaluation);
+  assert.equal(second.result.attempt.status, "feedback_ready");
+});
+
 test("a different user cannot submit another user's attempt", async () => {
   const { reviewRepo, practiceRepo, sessionId } = await setup();
   await getOrStartPracticeScenarioAttempt(reviewRepo, practiceRepo, "user_a", sessionId, SCENARIO_ID);

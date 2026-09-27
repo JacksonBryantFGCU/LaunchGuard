@@ -97,6 +97,17 @@ export async function submitPracticeScenarioResponse(
   const attempt = await practiceRepo.getPracticeScenarioAttempt(reviewSessionId, practiceScenarioId);
   if (!attempt) return notFound("This practice scenario has not been started yet.");
 
+  // Idempotent: a resubmission (double-click, a client retry after a
+  // dropped/errored response, ...) returns the already-computed result
+  // instead of re-running the transition, which would otherwise throw
+  // AttemptLockedError uncaught here and surface as a raw 500 even though
+  // the original submission fully succeeded server-side.
+  if (attempt.status !== "investigating") {
+    const existing = await practiceRepo.getPracticeScenarioResult(attempt.id);
+    if (existing) return { ok: true, result: { attempt, evaluation: existing.resultData } };
+    return locked;
+  }
+
   const [draft, affectedRequirementIds, evidenceIds] = await Promise.all([
     practiceRepo.getPracticeScenarioResponse(attempt.id),
     practiceRepo.getPracticeScenarioRequirements(attempt.id),
