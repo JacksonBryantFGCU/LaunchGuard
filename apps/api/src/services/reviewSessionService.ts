@@ -39,7 +39,7 @@ const locked: ServiceFailure = {
 };
 const badRequest = (error: string, message: string): ServiceFailure => ({ ok: false, status: 400, error, message });
 
-async function requireOwnedSession(
+export async function requireOwnedSession(
   repo: ReviewRepository,
   userId: string,
   sessionId: string,

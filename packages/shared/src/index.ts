@@ -4,3 +4,7 @@ export * from "./conversationTranscript.js";
 export * from "./voiceSession.js";
 export * from "./stressTestReveal.js";
 export * from "./reviewSession.js";
+export * from "./scenarioResponse.js";
+export * from "./practiceScenario.js";
+export * from "./practiceScenarioAttempt.js";
+export * from "./stressLab.js";

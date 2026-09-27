@@ -3,9 +3,14 @@ import { ReactFlow, Background, Controls, MarkerType, type Node, type Edge } fro
 import "@xyflow/react/dist/style.css";
 import type { ArchitectureEdge, ArchitectureNode, EdgeEffectState, NodeEffectState } from "@redline/shared";
 import { ArchitectureNodeView } from "./ArchitectureNodeView.js";
+import { StressRuntimeEdge } from "./StressRuntimeEdge.js";
 import type { ArchitectureSelection } from "../../features/architecture-review/useSelection.js";
 
+// Defined outside the component so React Flow never sees a new object
+// identity per render (spec #50) - a fresh nodeTypes/edgeTypes object on
+// every render forces React Flow to re-mount every custom node/edge.
 const nodeTypes = { architecture: ArchitectureNodeView };
+const edgeTypes = { "stress-edge": StressRuntimeEdge };
 
 // Stress-overlay color treatment, restrained to the four non-normal states
 // (Phase 5). "normal"/undefined never override the ordinary review styling.
@@ -102,7 +107,12 @@ export function ArchitectureCanvas({
           source: edge.source,
           target: edge.target,
           label,
-          type: "smoothstep",
+          // Only the Stress Lab overlay (edgeStressStates present) uses the
+          // animated-flow custom edge - the ordinary review canvas keeps its
+          // ordinary smoothstep edge unchanged (spec #48: restrained, not
+          // forced everywhere).
+          type: edgeStressStates ? "stress-edge" : "smoothstep",
+          data: { stressState },
           animated: edge.mode === "asynchronous" || Boolean(stressColor),
           selected: isSelected,
           deletable: false,
@@ -121,7 +131,9 @@ export function ArchitectureCanvas({
         nodes={flowNodes}
         edges={flowEdges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
+        fitViewOptions={{ padding: 0.15, maxZoom: 1.5 }}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 
 const HOW_IT_WORKS = [
-  { title: "Review", body: "Understand requirements and inspect the architecture." },
-  { title: "Investigate", body: "Question the AI architect and collect technical evidence." },
-  { title: "Decide", body: "Submit architecture findings and recommendations." },
-  { title: "Stress Test", body: "Watch the system react to realistic failure conditions." },
-  { title: "Improve", body: "Get structured feedback and build architecture judgment." },
+  { title: "Situation", body: "Get dropped into a realistic engineering incident." },
+  { title: "Investigate", body: "Inspect metrics, requirements, architecture, and question the architect." },
+  { title: "Decide", body: "Explain your diagnosis, response, and architecture decision." },
+  { title: "See What Happens", body: "Watch the system react to the situation you just analyzed." },
+  { title: "Progress", body: "Get objective feedback and move to the next scenario." },
 ];
 
 const TRAINED_ON = ["Reliability", "Scalability", "Data Integrity", "Distributed Systems", "Resilience", "Architecture Tradeoffs"];
@@ -42,8 +42,8 @@ export function LandingPage() {
               not just design them.
             </h1>
             <p className="mt-6 max-w-lg text-base text-slate-400">
-              Practice architecture review through guided missions. Inspect real system designs, question the
-              architect, identify production risks, and see how the system behaves under failure.
+              Work through realistic system scenarios, investigate requirements and system behavior, question the
+              architect, and explain what you would do.
             </p>
             <div className="mt-8 flex items-center gap-4">
               <Link
@@ -67,10 +67,10 @@ export function LandingPage() {
               backgroundSize: "24px 24px",
             }}
           >
-            <p className="text-xs tracking-widest text-slate-500">MISSION 2 / 5</p>
-            <h2 className="mt-2 text-lg font-semibold text-slate-100">Payment Safety</h2>
+            <p className="text-xs tracking-widest text-slate-500">SCENARIO 2 / 5</p>
+            <h2 className="mt-2 text-lg font-semibold text-slate-100">Payment Provider Degradation</h2>
             <p className="mt-2 text-sm text-slate-400">
-              Determine whether payment processing remains safe during retries and provider degradation.
+              Payment-provider latency has spiked while checkout traffic stays high. What do you do?
             </p>
             <div className="mt-6 flex flex-col items-center gap-2 text-xs text-slate-300">
               <div className="rounded-md border border-slate-700 bg-slate-800 px-4 py-2">Checkout Service</div>

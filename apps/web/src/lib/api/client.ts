@@ -66,7 +66,7 @@ export async function apiGet<T>(path: string, parse: (data: unknown) => T, optio
 }
 
 async function apiMutate<T>(
-  method: "POST" | "PATCH" | "DELETE",
+  method: "POST" | "PATCH" | "PUT" | "DELETE",
   path: string,
   body: unknown,
   parse: (data: unknown) => T,
@@ -107,6 +107,10 @@ export function apiPost<T>(path: string, body: unknown, parse: (data: unknown) =
 
 export function apiPatch<T>(path: string, body: unknown, parse: (data: unknown) => T, options: ApiRequestOptions = {}): Promise<T> {
   return apiMutate("PATCH", path, body, parse, options);
+}
+
+export function apiPut<T>(path: string, body: unknown, parse: (data: unknown) => T, options: ApiRequestOptions = {}): Promise<T> {
+  return apiMutate("PUT", path, body, parse, options);
 }
 
 export function apiDelete<T>(path: string, parse: (data: unknown) => T, options: ApiRequestOptions = {}): Promise<T> {

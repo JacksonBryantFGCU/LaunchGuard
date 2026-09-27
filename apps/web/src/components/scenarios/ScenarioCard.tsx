@@ -30,10 +30,10 @@ export function ScenarioCard({ scenario }: { scenario: ArchitectureScenarioPrevi
       </dl>
 
       <Link
-        to={`/app/review/${scenario.slug}`}
+        to={`/app/practice/${scenario.slug}`}
         className="mt-1 inline-flex w-fit items-center rounded-md bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-100"
       >
-        Start Architecture Review
+        Start Practice
       </Link>
     </article>
   );

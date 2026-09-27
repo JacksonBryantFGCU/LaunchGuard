@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import type { StressTestReveal } from "@redline/shared";
 import { useReviewState } from "../features/architecture-review/reviewStateStore.js";
 import { useSelection } from "../features/architecture-review/useSelection.js";
 import { getStressTests } from "../features/stress-test/api.js";
+import { completePracticeScenarioAttempt } from "../features/practice-scenarios/api.js";
 import { ApiError } from "../lib/api/client.js";
 import {
   createInitialStressTestSimulatorState,
@@ -19,6 +20,18 @@ import type { ReviewOutletContext } from "./ArchitectureReviewLayout.js";
 
 const STEP_DURATION_MS = 2200;
 
+// Which stress fixture is the "consequence" for each practice scenario.
+// This is a product-level scene mapping (which authored simulation follows
+// which situation), not scoring truth - see packages/scenarios' own
+// ponytail note on Checkout Latency Spike reusing the 10x-spike fixture.
+const PRACTICE_CONSEQUENCE_STRESS_TEST: Record<string, string> = {
+  "checkout-latency-spike": "stress-10x-spike",
+  "payment-provider-degradation": "stress-payment-degradation",
+  "duplicate-checkout-requests": "stress-duplicate-checkout",
+  "black-friday-capacity-surge": "stress-10x-spike",
+  "regional-database-failure": "stress-regional-db-failure",
+};
+
 type LoadState =
   | { status: "loading" }
   | { status: "error"; message: string }
@@ -31,8 +44,22 @@ export function StressTestSimulatorPage() {
   const [load, setLoad] = useState<LoadState>({ status: "loading" });
   const [simState, dispatch] = useReducer(stressTestSimulatorReducer, undefined, createInitialStressTestSimulatorState);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const reviewId = reviewState.submissionStatus === "submitted" ? reviewState.reviewId : null;
+  // Practice-scenario consequence reveal passes reviewId explicitly (the
+  // practice attempt's parent review session never goes through the legacy
+  // full-review submission this page originally gated on).
+  const practiceScenarioId = searchParams.get("practiceScenarioId");
+  const practiceTitle = searchParams.get("title");
+  const reviewId = searchParams.get("reviewId") ?? (reviewState.submissionStatus === "submitted" ? reviewState.reviewId : null);
+  const autoSelectedTestId = practiceScenarioId ? PRACTICE_CONSEQUENCE_STRESS_TEST[practiceScenarioId] : undefined;
+
+  useEffect(() => {
+    if (autoSelectedTestId && !simState.selectedTestId) {
+      dispatch({ type: "SELECT_TEST", testId: autoSelectedTestId });
+    }
+  }, [autoSelectedTestId, simState.selectedTestId]);
 
   useEffect(() => {
     if (!reviewId) return;
@@ -173,9 +200,13 @@ export function StressTestSimulatorPage() {
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col">
       <header className="border-b border-slate-800 px-4 py-3">
-        <h1 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Redline · Architecture Stress Test</h1>
+        <h1 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+          {practiceScenarioId ? "Consequence" : "Redline · Architecture Stress Test"}
+        </h1>
         <p className="text-xs text-slate-500">
-          {scenario.title} · {scenario.reviewCode}
+          {practiceScenarioId
+            ? `${practiceTitle ?? "This scenario"} · Watch how the current architecture behaves under the situation you just analyzed.`
+            : `${scenario.title} · ${scenario.reviewCode}`}
         </p>
       </header>
 
@@ -220,7 +251,20 @@ export function StressTestSimulatorPage() {
         <p className="text-xs text-slate-500">
           {simState.completedTestIds.length} / {tests.length} tests completed
         </p>
-        {allTestsCompleted ? (
+        {practiceScenarioId && reviewId ? (
+          <button
+            type="button"
+            disabled={testStatus !== "passed" && testStatus !== "failed"}
+            onClick={() => {
+              completePracticeScenarioAttempt(reviewId, practiceScenarioId)
+                .then(() => navigate(`/app/practice/${scenario.slug}`))
+                .catch((err: unknown) => console.error("Failed to complete practice scenario", err));
+            }}
+            className="rounded-md bg-sky-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Scenario Complete · Return to Scenario List
+          </button>
+        ) : allTestsCompleted ? (
           <span
             title="Review evaluation is a future phase."
             aria-disabled="true"

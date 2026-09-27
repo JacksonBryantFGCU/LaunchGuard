@@ -12,7 +12,7 @@ export function Header() {
             Redline
           </Link>
           <Link to="/app" className="text-sm text-slate-400 hover:text-slate-100">
-            Scenarios
+            Practice
           </Link>
           <Link to="/app/history" className="text-sm text-slate-400 hover:text-slate-100">
             History

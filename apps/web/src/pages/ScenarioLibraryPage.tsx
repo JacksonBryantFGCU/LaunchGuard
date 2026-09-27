@@ -30,9 +30,9 @@ export function ScenarioLibraryPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-      <h1 className="text-xl font-semibold text-slate-100">Architecture Scenario Library</h1>
+      <h1 className="text-xl font-semibold text-slate-100">System Architecture Practice</h1>
       <p className="mt-1 text-sm text-slate-400">
-        Review a proposed system architecture from another engineer before it moves forward.
+        Work through realistic engineering situations, investigate the system, and decide what you'd do.
       </p>
 
       <div className="mt-8">
