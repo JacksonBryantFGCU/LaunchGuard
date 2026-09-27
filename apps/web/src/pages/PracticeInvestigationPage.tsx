@@ -126,15 +126,23 @@ function OverviewTab() {
   );
 }
 
-function EvidenceSaveButton({ onSave }: { onSave: () => void }) {
+function EvidenceSaveButton({ onSave }: { onSave: () => Promise<unknown> }) {
   const [saved, setSaved] = useState(false);
   return (
     <button
       type="button"
       onClick={() => {
-        onSave();
-        setSaved(true);
-        setTimeout(() => setSaved(false), 1500);
+        // Awaited so a rejection (e.g. the attempt locked between render and
+        // click) never becomes an unhandled promise rejection, and "Saved"
+        // only shows once the save actually succeeded - callers should
+        // still hide this button once locked (spec: response/evidence
+        // become read-only on submit), this is the last-resort backstop.
+        onSave()
+          .then(() => {
+            setSaved(true);
+            setTimeout(() => setSaved(false), 1500);
+          })
+          .catch((err: unknown) => console.error("Failed to save evidence", err));
       }}
       className="shrink-0 rounded-md border border-slate-700 px-2 py-1 text-xs font-medium text-slate-300 hover:border-slate-500"
     >
@@ -144,7 +152,8 @@ function EvidenceSaveButton({ onSave }: { onSave: () => void }) {
 }
 
 function MetricsTab({ system }: { system: PracticeScenarioOutletContext["system"] }) {
-  const { addEvidence } = usePracticeAttempt();
+  const { addEvidence, view } = usePracticeAttempt();
+  const locked = isResponseLocked(view.status);
   const grouped = system.evidence.reduce<Record<string, typeof system.evidence>>((acc, item) => {
     (acc[item.category] ??= []).push(item);
     return acc;
@@ -166,16 +175,18 @@ function MetricsTab({ system }: { system: PracticeScenarioOutletContext["system"
                     <dt className="text-xs text-slate-400">{item.label}</dt>
                     <dd className="text-sm font-medium text-slate-100">{item.value}</dd>
                   </div>
-                  <EvidenceSaveButton
-                    onSave={() =>
-                      addEvidence({
-                        sourceType: "scenario_evidence",
-                        sourceId: item.id,
-                        label: item.label,
-                        content: item.value,
-                      })
-                    }
-                  />
+                  {!locked && (
+                    <EvidenceSaveButton
+                      onSave={() =>
+                        addEvidence({
+                          sourceType: "scenario_evidence",
+                          sourceId: item.id,
+                          label: item.label,
+                          content: item.value,
+                        })
+                      }
+                    />
+                  )}
                 </div>
               ))}
             </dl>
@@ -187,7 +198,8 @@ function MetricsTab({ system }: { system: PracticeScenarioOutletContext["system"
 }
 
 function RequirementsTab({ system }: { system: PracticeScenarioOutletContext["system"] }) {
-  const { addEvidence } = usePracticeAttempt();
+  const { addEvidence, view } = usePracticeAttempt();
+  const locked = isResponseLocked(view.status);
   return (
     <div className="mx-auto max-w-2xl px-6 py-8">
       <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">System Requirements</h2>
@@ -200,9 +212,11 @@ function RequirementsTab({ system }: { system: PracticeScenarioOutletContext["sy
               <p className="mt-0.5 text-sm text-slate-200">{req.summary}</p>
               {req.target && <p className="mt-1 text-xs font-medium text-sky-400">{req.target}</p>}
             </div>
-            <EvidenceSaveButton
-              onSave={() => addEvidence({ sourceType: "requirement", sourceId: req.id, label: req.summary, content: req.target ?? req.summary })}
-            />
+            {!locked && (
+              <EvidenceSaveButton
+                onSave={() => addEvidence({ sourceType: "requirement", sourceId: req.id, label: req.summary, content: req.target ?? req.summary })}
+              />
+            )}
           </li>
         ))}
       </ul>
@@ -211,7 +225,8 @@ function RequirementsTab({ system }: { system: PracticeScenarioOutletContext["sy
 }
 
 function ArchitectureTab({ system }: { system: PracticeScenarioOutletContext["system"] }) {
-  const { addEvidence } = usePracticeAttempt();
+  const { addEvidence, view } = usePracticeAttempt();
+  const locked = isResponseLocked(view.status);
   const { selection, selectNode, selectEdge, clearSelection } = useSelection();
   const selectedNode: ArchitectureNode | undefined = selection?.kind === "node" ? system.nodes.find((n) => n.id === selection.id) : undefined;
   const selectedEdge: ArchitectureEdge | undefined = selection?.kind === "edge" ? system.edges.find((e) => e.id === selection.id) : undefined;
@@ -241,13 +256,15 @@ function ArchitectureTab({ system }: { system: PracticeScenarioOutletContext["sy
           {selectedNode && (
             <>
               <ComponentInspector node={selectedNode} details={system.componentDetails.find((d) => d.nodeId === selectedNode.id)} />
-              <div className="mt-3">
-                <EvidenceSaveButton
-                  onSave={() =>
-                    addEvidence({ sourceType: "architecture_node", sourceId: selectedNode.id, label: selectedNode.label, content: selectedNode.summary })
-                  }
-                />
-              </div>
+              {!locked && (
+                <div className="mt-3">
+                  <EvidenceSaveButton
+                    onSave={() =>
+                      addEvidence({ sourceType: "architecture_node", sourceId: selectedNode.id, label: selectedNode.label, content: selectedNode.summary })
+                    }
+                  />
+                </div>
+              )}
             </>
           )}
           {selectedEdge && (
@@ -258,18 +275,20 @@ function ArchitectureTab({ system }: { system: PracticeScenarioOutletContext["sy
                 targetNode={system.nodes.find((n) => n.id === selectedEdge.target)}
                 details={system.connectionDetails.find((d) => d.edgeId === selectedEdge.id)}
               />
-              <div className="mt-3">
-                <EvidenceSaveButton
-                  onSave={() =>
-                    addEvidence({
-                      sourceType: "architecture_edge",
-                      sourceId: selectedEdge.id,
-                      label: `${nodeLabel(selectedEdge.source)} -> ${nodeLabel(selectedEdge.target)}`,
-                      content: selectedEdge.label,
-                    })
-                  }
-                />
-              </div>
+              {!locked && (
+                <div className="mt-3">
+                  <EvidenceSaveButton
+                    onSave={() =>
+                      addEvidence({
+                        sourceType: "architecture_edge",
+                        sourceId: selectedEdge.id,
+                        label: `${nodeLabel(selectedEdge.source)} -> ${nodeLabel(selectedEdge.target)}`,
+                        content: selectedEdge.label,
+                      })
+                    }
+                  />
+                </div>
+              )}
             </>
           )}
           {!selectedNode && !selectedEdge && <p className="text-xs text-slate-500">Select a component or connection to inspect it.</p>}
