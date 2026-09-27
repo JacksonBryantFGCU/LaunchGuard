@@ -8,12 +8,19 @@ import type {
 } from "../services/leaderboardRepository.js";
 
 // Never leak a raw Supabase/Postgres error to callers - same pattern as
-// SupabasePracticeScenarioRepository's RepositoryError.
+// SupabasePracticeScenarioRepository's RepositoryError. `dbCode` is hoisted
+// onto the error itself (not just `cause`) because pino's default error
+// serializer does not recurse into a non-Error `cause` - without this, a
+// PostgREST error code like PGRST200 ("relationship not found in schema
+// cache") never made it into the server logs, only its message did.
 class RepositoryError extends Error {
+  readonly dbCode?: string;
+
   constructor(operation: string, cause: unknown) {
     super(`Leaderboard repository operation failed: ${operation}`);
     this.name = "RepositoryError";
     this.cause = cause;
+    if (cause && typeof cause === "object" && "code" in cause) this.dbCode = String((cause as { code: unknown }).code);
   }
 }
 
@@ -118,22 +125,44 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
     if (error) throw new RepositoryError("recordBestScore:write", error);
   }
 
+  // Two plain filtered selects rather than a single PostgREST embedded-
+  // resource (`!inner`) query: every other repository in this codebase
+  // queries one table at a time (see SupabasePracticeScenarioRepository),
+  // and relationship embedding depends on PostgREST's schema cache having
+  // already resolved the leaderboard_entries -> leaderboard_profiles
+  // foreign key. When that cache is stale (a very common Supabase gotcha
+  // right after a migration), the embed fails with PGRST200 and the whole
+  // leaderboard 500s even though both tables and all the data are fine.
+  // At this dataset's scale, one extra round trip is a trivial cost for
+  // never depending on that cache being warm.
+  private async getOptedInUserIds(): Promise<string[]> {
+    const { data, error } = await this.client.from("leaderboard_profiles").select("user_id").eq("leaderboard_opt_in", true);
+    if (error) throw new RepositoryError("getOptedInUserIds", error);
+    return (data as { user_id: string }[]).map((row) => row.user_id);
+  }
+
   async listScenarioLeaderboard(practiceScenarioId: string): Promise<LeaderboardEntryRecord[]> {
+    const optedInUserIds = await this.getOptedInUserIds();
+    if (optedInUserIds.length === 0) return [];
+
     const { data, error } = await this.client
       .from("leaderboard_entries")
-      .select("user_id, practice_scenario_id, normalized_score, leaderboard_profiles!inner(leaderboard_opt_in)")
+      .select("user_id, practice_scenario_id, normalized_score")
       .eq("practice_scenario_id", practiceScenarioId)
-      .eq("leaderboard_profiles.leaderboard_opt_in", true)
+      .in("user_id", optedInUserIds)
       .order("normalized_score", { ascending: false });
     if (error) throw new RepositoryError("listScenarioLeaderboard", error);
     return (data as EntryRow[]).map(toEntryRecord);
   }
 
   async listOverallLeaderboard(): Promise<LeaderboardEntryRecord[]> {
+    const optedInUserIds = await this.getOptedInUserIds();
+    if (optedInUserIds.length === 0) return [];
+
     const { data, error } = await this.client
       .from("leaderboard_entries")
-      .select("user_id, practice_scenario_id, normalized_score, leaderboard_profiles!inner(leaderboard_opt_in)")
-      .eq("leaderboard_profiles.leaderboard_opt_in", true)
+      .select("user_id, practice_scenario_id, normalized_score")
+      .in("user_id", optedInUserIds)
       .order("normalized_score", { ascending: false });
     if (error) throw new RepositoryError("listOverallLeaderboard", error);
     return (data as EntryRow[]).map(toEntryRecord);
