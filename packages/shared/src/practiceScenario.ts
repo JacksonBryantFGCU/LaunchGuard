@@ -76,20 +76,28 @@ export type WrittenResponseEvaluation = z.infer<typeof WrittenResponseEvaluation
 export const ResilienceTestOutcomeSchema = z.object({
   testId: z.string().min(1),
   label: z.string().min(1),
-  // Passing only counts at the test's authored default parameters -
-  // weakening the test (less traffic, a shorter failure window, ...) to
-  // force a pass earns no credit here, even though the run itself is
-  // still saved and visible in Stress Lab run history.
+  // Continuous headroom (0-1), the worst margin across that test's own
+  // requirements on its best qualifying run - 0 for no run / a violated
+  // run, 1 for maximal headroom on every requirement. Only a run at the
+  // test's authored default parameters qualifies - weakening the test
+  // (less traffic, a shorter failure window, ...) to force a pass earns no
+  // credit here, even though the run itself is still saved and visible in
+  // Stress Lab run history.
+  marginScore: z.number().min(0).max(1),
+  // Derived (marginScore > 0), kept alongside it for UI convenience -
+  // "cleared every requirement at least once" as a simple yes/no, without
+  // needing the caller to re-derive it from marginScore itself.
   passedAtDefaultParameters: z.boolean(),
 });
 export type ResilienceTestOutcome = z.infer<typeof ResilienceTestOutcomeSchema>;
 
-// The Stress Lab component of the score (8 pts) - one point share per
-// stress test the scenario offers, earned by passing it at default
-// parameters at least once before submitting. 0/0 for a scenario with no
-// Stress Lab at all, so it never lowers that scenario's max score.
+// The Stress Lab component of the score (8 pts) - a continuous share per
+// stress test the scenario offers (not binary pass/fail): each test
+// contributes up to maxResilienceScore/testCount points, scaled by how
+// much headroom the best qualifying run achieved. 0/0 for a scenario with
+// no Stress Lab at all, so it never lowers that scenario's max score.
 export const ResilienceEvaluationSchema = z.object({
-  resilienceScore: z.number().int().min(0).max(8),
+  resilienceScore: z.number().min(0).max(8),
   maxResilienceScore: z.union([z.literal(0), z.literal(8)]),
   resilienceTestResults: z.array(ResilienceTestOutcomeSchema),
 });
@@ -99,7 +107,9 @@ export type ResilienceEvaluation = z.infer<typeof ResilienceEvaluationSchema>;
 // once both are known (see combineScenarioEvaluation in @redline/scenarios)
 // - never computed twice or partially on the client.
 export const ScenarioEvaluationResultSchema = WrittenResponseEvaluationSchema.merge(ResilienceEvaluationSchema).extend({
-  totalScore: z.number().int().nonnegative(),
+  // Not .int(): resilienceScore is a continuous share (spec: margin-based,
+  // not binary pass/fail), so the sum can land on a fraction too.
+  totalScore: z.number().nonnegative(),
   maxTotalScore: z.number().int().positive(),
 });
 export type ScenarioEvaluationResult = z.infer<typeof ScenarioEvaluationResultSchema>;

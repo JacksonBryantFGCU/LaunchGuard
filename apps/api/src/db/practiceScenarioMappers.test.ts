@@ -154,7 +154,7 @@ test("toStressSimulationRunRecord maps a row into camelCase, preserving jsonb pa
     modifications: [{ kind: "add-component", id: "m1", componentType: "cache", config: {} }],
     passed: true,
     final_metrics: { checkoutP95Ms: 400 },
-    requirement_results: [{ requirementId: "req-throughput", status: "met", explanation: "ok" }],
+    requirement_results: [{ requirementId: "req-throughput", status: "met", marginRatio: 1, explanation: "ok" }],
     bottlenecks: [],
     summary: "All requirements held throughout the run.",
     created_at: "2026-01-01T00:00:00.000Z",
@@ -171,7 +171,7 @@ test("stressSimulationRunInputToRow maps camelCase fields into the row's snake_c
     modifications: [],
     passed: false,
     finalMetrics: { checkoutP95Ms: 3400 },
-    requirementResults: [{ requirementId: "req-latency", status: "violated", explanation: "too slow" }],
+    requirementResults: [{ requirementId: "req-latency", status: "violated", marginRatio: 0, explanation: "too slow" }],
     bottlenecks: [],
     summary: "1 requirement(s) were violated during the run.",
   });

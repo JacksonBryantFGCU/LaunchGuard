@@ -13,6 +13,8 @@ import { resolveActiveComponents } from "@redline/shared";
 import {
   simulateArchitecture,
   computeNeededInstances,
+  marginBelowTarget,
+  marginAboveTarget,
   type ComponentSimulationProfile,
   type DatabaseSimulationProfile,
   type RequirementTarget,
@@ -112,11 +114,6 @@ function frameInputsAt(t: number, category: StressTestCategory, p: StressParamet
     default:
       return base;
   }
-}
-
-function worseStatus(a: SimulationRequirementResult["status"], b: SimulationRequirementResult["status"]): SimulationRequirementResult["status"] {
-  const rank = { met: 0, at_risk: 1, violated: 2 } as const;
-  return rank[b] > rank[a] ? b : a;
 }
 
 function mergeBottlenecks(all: SimulationBottleneck[][]): SimulationBottleneck[] {
@@ -275,6 +272,7 @@ export function runStressTimeline(input: StressTimelineTestInput): StressTestTim
       return {
         requirementId: req.requirementId,
         status: observedPercent < target ? "violated" : "met",
+        marginRatio: marginAboveTarget(observedPercent, target, 100),
         observedValue: `${observedPercent}% availability across the run`,
         explanation:
           observedPercent < target
@@ -289,6 +287,7 @@ export function runStressTimeline(input: StressTimelineTestInput): StressTestTim
       return {
         requirementId: req.requirementId,
         status: observedSeconds > target ? "violated" : "met",
+        marginRatio: marginBelowTarget(observedSeconds, target),
         observedValue: `recovered in ${observedSeconds}s`,
         explanation:
           observedSeconds > target
@@ -296,13 +295,17 @@ export function runStressTimeline(input: StressTimelineTestInput): StressTestTim
             : "Recovery completes within the target recovery time.",
       };
     }
+    // The worst-case frame for this requirement - by margin, not status:
+    // two "met" frames can still have very different headroom, and the
+    // score downstream needs the true minimum, not just the first frame
+    // that happened to share the coarsest bucket.
     return frames.reduce<SimulationRequirementResult>(
       (worst, frame) => {
         const frameResult = frame.requirementResults.find((r) => r.requirementId === req.requirementId);
         if (!frameResult) return worst;
-        return worseStatus(worst.status, frameResult.status) === frameResult.status ? frameResult : worst;
+        return frameResult.marginRatio < worst.marginRatio ? frameResult : worst;
       },
-      { requirementId: req.requirementId, status: "met", explanation: "No frame evaluated this requirement." },
+      { requirementId: req.requirementId, status: "met", marginRatio: 1, explanation: "No frame evaluated this requirement." },
     );
   });
 

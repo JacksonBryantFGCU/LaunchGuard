@@ -7,7 +7,10 @@ import type { PracticeResponseDraft, ScenarioEvaluationResult } from "@redline/s
 // stays out of the deployed bundle's execution path (Vite still ships the
 // dead code; tree-shaking it out isn't worth a build-config change for a
 // file this small).
-export type MockResultPreset = "pass" | "fail";
+// "pass" and "thin" both clear every requirement - they exist to preview
+// the continuous margin score (spec: comfortable vs barely-passing should
+// score differently, not tie under the old binary pass/fail).
+export type MockResultPreset = "pass" | "thin" | "fail";
 
 const MOCK_RESPONSE: PracticeResponseDraft = {
   diagnosis: "[DEV PREVIEW] Checkout and Inventory share one connection pool against Postgres's connection limit.",
@@ -20,7 +23,9 @@ const MOCK_RESPONSE: PracticeResponseDraft = {
 };
 
 function mockResult(preset: MockResultPreset): ScenarioEvaluationResult {
-  const pass = preset === "pass";
+  const pass = preset !== "fail";
+  const margin = preset === "pass" ? 0.92 : preset === "thin" ? 0.18 : 0;
+  const resilienceScore = Math.round(8 * margin * 10) / 10;
   return {
     scenarioId: "dev-mock",
     objectiveScore: pass ? 16 : 6,
@@ -38,13 +43,10 @@ function mockResult(preset: MockResultPreset): ScenarioEvaluationResult {
     submittedSeverity: "high",
     expectedSeverity: "high",
     severityAligned: true,
-    resilienceScore: pass ? 8 : 0,
+    resilienceScore,
     maxResilienceScore: 8,
-    resilienceTestResults: [
-      { testId: "sustained-load", label: "Sustained Load", passedAtDefaultParameters: pass },
-      { testId: "traffic-spike", label: "Traffic Spike", passedAtDefaultParameters: pass },
-    ],
-    totalScore: pass ? 24 : 6,
+    resilienceTestResults: [{ testId: "sustained-load", label: "Sustained Load", marginScore: margin, passedAtDefaultParameters: margin > 0 }],
+    totalScore: (pass ? 16 : 6) + resilienceScore,
     maxTotalScore: 24,
   };
 }

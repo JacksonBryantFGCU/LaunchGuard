@@ -100,6 +100,24 @@ function round(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+// How comfortably an observed value clears its target, as a fraction of
+// the metric's own scale - 0 at (or past) the violation line, 1 at maximal
+// headroom. This is the number the resilience score is built from
+// downstream (spec: continuous margin, not binary pass/fail), computed
+// once here from the exact same observed/target values the requirement's
+// own met/at_risk/violated status already comes from - never a second,
+// disconnected formula.
+export function marginBelowTarget(observed: number, target: number): number {
+  if (target <= 0) return observed <= 0 ? 1 : 0;
+  return clamp01((target - observed) / target);
+}
+
+export function marginAboveTarget(observed: number, target: number, ceiling: number): number {
+  const headroom = ceiling - target;
+  if (headroom <= 0) return observed >= target ? 1 : 0;
+  return clamp01((observed - target) / headroom);
+}
+
 interface NodeSimResult {
   nodeId: string;
   instances: number;
@@ -296,7 +314,7 @@ export function simulateArchitecture(input: StressLabSimulationInput): Architect
       // Recovery time is a whole-run aggregate a single frame can't observe
       // on its own - runStressTimeline recomputes this requirement once the
       // full timeline is known.
-      return { requirementId: req.requirementId, status: "met", explanation: "Evaluated across the full run." };
+      return { requirementId: req.requirementId, status: "met", marginRatio: 1, explanation: "Evaluated across the full run." };
     }
     if (req.area === "availability") {
       const target = req.targetPercent ?? 100;
@@ -304,6 +322,7 @@ export function simulateArchitecture(input: StressLabSimulationInput): Architect
       return {
         requirementId: req.requirementId,
         status,
+        marginRatio: marginAboveTarget(availabilityPercent, target, 100),
         observedValue: `${availabilityPercent}% this frame`,
         explanation:
           status === "violated"
@@ -316,6 +335,10 @@ export function simulateArchitecture(input: StressLabSimulationInput): Architect
       return {
         requirementId: req.requirementId,
         status,
+        // Forced to 0 on a hard violation even if dbUtilizationPercent
+        // itself looks fine - a shortfall from a configured autoscaling
+        // ceiling is a real failure the DB number alone wouldn't show.
+        marginRatio: status === "violated" ? 0 : clamp01(1 - utilization),
         observedValue: connectionsRejected ? `${Math.round(demandBeforeDbCap)} connections demanded / ${input.database.maxConnections} available` : undefined,
         explanation: connectionsRejected
           ? "Connection demand exceeds the database's connection ceiling; excess connections fail."
@@ -329,6 +352,7 @@ export function simulateArchitecture(input: StressLabSimulationInput): Architect
     return {
       requirementId: req.requirementId,
       status,
+      marginRatio: marginBelowTarget(checkoutP95Ms, targetMs),
       observedValue: `p95 ${checkoutP95Ms}ms`,
       explanation:
         status === "violated"
@@ -427,6 +451,7 @@ function simulateDatabaseUnavailable(input: StressLabSimulationInput): Architect
   const requirementResults: ArchitectureSimulationResult["requirementResults"] = input.requirementTargets.map((req) => ({
     requirementId: req.requirementId,
     status: req.area === "availability" || req.area === "recovery" ? ("met" as const) : ("violated" as const),
+    marginRatio: req.area === "availability" || req.area === "recovery" ? 1 : 0,
     explanation:
       req.area === "availability" || req.area === "recovery"
         ? "Evaluated across the full run."

@@ -97,38 +97,48 @@ const MAX_RESILIENCE_SCORE = 8;
 interface StressRunOutcome {
   testId: string;
   parameters: StressParameterValues;
-  passed: boolean;
+  // The worst-case margin (0-1) across the run's own requirements - see
+  // marginBelowTarget/marginAboveTarget in stressLab/engine.ts. A violated
+  // requirement always carries marginRatio 0, so a genuinely failed run
+  // already scores 0 here without needing a separate passed check.
+  requirementResults: { marginRatio: number }[];
 }
 
 function ranAtDefaultParameters(profile: StressProfile, parameters: StressParameterValues): boolean {
   return profile.parameters.every((p) => (parameters[p.id] ?? p.defaultValue) === p.defaultValue);
 }
 
+/** The worst margin across a run's own requirements - one violated or thin requirement caps the whole run's credit, same principle as "passed" requiring every requirement to hold. */
+function runMargin(run: StressRunOutcome): number {
+  if (run.requirementResults.length === 0) return 0;
+  return Math.min(...run.requirementResults.map((r) => r.marginRatio));
+}
+
 /**
- * Resilience component of the total score: one point share per stress test
- * the scenario offers (spec: "pass at the scenario's authored default
- * load"). A test counts only once it has a PASSED run at its own default
- * parameters - a passing run reached by weakening the test (less traffic,
- * a shorter failure window, ...) doesn't earn credit, even though the run
- * itself still shows up in Stress Lab run history. `testDefinitions: []`
- * (a scenario with no Stress Lab) returns 0/0, never lowering that
- * scenario's max score.
+ * Resilience component of the total score: a continuous share per stress
+ * test the scenario offers (spec: margin-based, not binary pass/fail), so
+ * comfortably clearing every requirement scores higher than barely
+ * clearing them, and both score higher than a fully failed run. Only a run
+ * at the test's own authored default parameters qualifies - weakening the
+ * test (less traffic, a shorter failure window, ...) to inflate the margin
+ * earns no credit, even though the run itself still shows up in Stress Lab
+ * run history. Across multiple qualifying runs, the best margin counts.
+ * `testDefinitions: []` (a scenario with no Stress Lab) returns 0/0, never
+ * lowering that scenario's max score.
  */
 export function evaluateResilience(testDefinitions: StressProfile[], runs: StressRunOutcome[]): ResilienceEvaluation {
   if (testDefinitions.length === 0) {
     return { resilienceScore: 0, maxResilienceScore: 0, resilienceTestResults: [] };
   }
 
-  const resilienceTestResults = testDefinitions.map((profile) => ({
-    testId: profile.id,
-    label: profile.label,
-    passedAtDefaultParameters: runs.some(
-      (run) => run.testId === profile.id && run.passed && ranAtDefaultParameters(profile, run.parameters),
-    ),
-  }));
+  const resilienceTestResults = testDefinitions.map((profile) => {
+    const qualifying = runs.filter((run) => run.testId === profile.id && ranAtDefaultParameters(profile, run.parameters));
+    const marginScore = qualifying.length > 0 ? Math.max(...qualifying.map(runMargin)) : 0;
+    return { testId: profile.id, label: profile.label, marginScore, passedAtDefaultParameters: marginScore > 0 };
+  });
 
-  const passedCount = resilienceTestResults.filter((r) => r.passedAtDefaultParameters).length;
-  const resilienceScore = Math.round(MAX_RESILIENCE_SCORE * (passedCount / testDefinitions.length));
+  const totalShare = resilienceTestResults.reduce((sum, r) => sum + r.marginScore, 0);
+  const resilienceScore = Math.round(MAX_RESILIENCE_SCORE * (totalShare / testDefinitions.length) * 10) / 10;
 
   return { resilienceScore, maxResilienceScore: MAX_RESILIENCE_SCORE, resilienceTestResults };
 }

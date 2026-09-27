@@ -386,7 +386,7 @@ function fakeRunInput(overrides: Partial<NewStressSimulationRunInput> = {}): New
     modifications: [],
     passed: true,
     finalMetrics: { checkoutP95Ms: 400 },
-    requirementResults: [{ requirementId: "req-throughput", status: "met", explanation: "ok" }],
+    requirementResults: [{ requirementId: "req-throughput", status: "met", marginRatio: 1, explanation: "ok" }],
     bottlenecks: [],
     summary: "All requirements held throughout the run.",
     ...overrides,

@@ -73,7 +73,7 @@ test("SimulationFrameSchema parses a single timestamped snapshot", () => {
     timestampSeconds: 30,
     nodeStates: [],
     edgeStates: [],
-    requirementResults: [{ requirementId: "req-throughput", status: "met", explanation: "Within capacity." }],
+    requirementResults: [{ requirementId: "req-throughput", status: "met", marginRatio: 1, explanation: "Within capacity." }],
     systemMetrics: { checkoutP95Ms: 400 },
   });
   assert.equal(frame.timestampSeconds, 30);
@@ -88,13 +88,13 @@ test("StressTestTimelineResultSchema parses a full run with frames and an aggreg
         timestampSeconds: 0,
         nodeStates: [],
         edgeStates: [],
-        requirementResults: [{ requirementId: "req-throughput", status: "met", explanation: "ok" }],
+        requirementResults: [{ requirementId: "req-throughput", status: "met", marginRatio: 1, explanation: "ok" }],
         systemMetrics: {},
       },
     ],
     finalMetrics: { checkoutP95Ms: 400 },
     bottlenecks: [],
-    requirementResults: [{ requirementId: "req-throughput", status: "met", explanation: "ok" }],
+    requirementResults: [{ requirementId: "req-throughput", status: "met", marginRatio: 1, explanation: "ok" }],
     passed: true,
     summary: "All requirements held throughout the run.",
   });
@@ -112,7 +112,7 @@ test("StressSimulationRunRecordSchema parses a persisted run record", () => {
     modifications: [],
     passed: false,
     finalMetrics: { checkoutP95Ms: 2738 },
-    requirementResults: [{ requirementId: "req-throughput", status: "violated", explanation: "x" }],
+    requirementResults: [{ requirementId: "req-throughput", status: "violated", marginRatio: 0, explanation: "x" }],
     bottlenecks: [],
     summary: "1 requirement(s) were violated during the run.",
     createdAt: "2026-01-01T00:00:00.000Z",

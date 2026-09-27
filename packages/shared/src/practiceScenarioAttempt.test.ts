@@ -70,7 +70,7 @@ test("accepts a fully-formed attempt view with evidence and a result", () => {
         severityAligned: false,
         resilienceScore: 4,
         maxResilienceScore: 8,
-        resilienceTestResults: [{ testId: "sustained-load", label: "Sustained Load", passedAtDefaultParameters: true }],
+        resilienceTestResults: [{ testId: "sustained-load", label: "Sustained Load", marginScore: 1, passedAtDefaultParameters: true }],
         totalScore: 14,
         maxTotalScore: 24,
       },

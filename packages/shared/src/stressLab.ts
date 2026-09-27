@@ -221,6 +221,12 @@ export type SimulationEvent = z.infer<typeof SimulationEventSchema>;
 export const SimulationRequirementResultSchema = z.object({
   requirementId: z.string().min(1),
   status: RequirementImpactStatusSchema,
+  // How comfortably the observed value clears its target, as a fraction of
+  // the metric's own scale: 0 at (or past) the violation line, 1 at
+  // maximal headroom. Computed alongside status from the same observed/
+  // target numbers, not a separate estimate - see marginBelowTarget/
+  // marginAboveTarget in packages/scenarios' engine.
+  marginRatio: z.number().min(0).max(1),
   observedValue: z.string().min(1).optional(),
   explanation: z.string().min(1),
 });

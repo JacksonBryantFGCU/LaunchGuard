@@ -46,7 +46,11 @@ export function PracticeResultPage() {
           <p className="mt-4 text-xs text-slate-600">
             Dev preview:{" "}
             <Link to="?mock=pass" className="underline">
-              pass
+              pass (comfortable margin)
+            </Link>{" "}
+            ·{" "}
+            <Link to="?mock=thin" className="underline">
+              thin (barely passing)
             </Link>{" "}
             ·{" "}
             <Link to="?mock=fail" className="underline">
@@ -141,22 +145,27 @@ export function PracticeResultPage() {
             System Resilience ({result.resilienceScore} / {result.maxResilienceScore})
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            Credit for each Stress Lab test passed at its default load before submitting - a run made easier by weakening the test doesn't count.
+            Credit scales with how comfortably the run cleared its requirements at the test's default load, not just whether it passed - a run made
+            easier by weakening the test doesn't count.
           </p>
-          <ul className="mt-3 flex flex-col gap-2">
-            {result.resilienceTestResults.map((test) => (
-              <li
-                key={test.testId}
-                className={`flex items-center justify-between rounded-md border p-2.5 text-sm ${
-                  test.passedAtDefaultParameters ? "border-emerald-900 bg-emerald-950/20" : "border-slate-800 bg-slate-900"
-                }`}
-              >
-                <span className="text-slate-200">{test.label}</span>
-                <span className={test.passedAtDefaultParameters ? "text-emerald-400" : "text-amber-400"}>
-                  {test.passedAtDefaultParameters ? "✓ Passed" : "✕ Not passed"}
-                </span>
-              </li>
-            ))}
+          <ul className="mt-3 flex flex-col gap-3">
+            {result.resilienceTestResults.map((test) => {
+              const percent = Math.round(test.marginScore * 100);
+              const barColor = percent === 0 ? "bg-red-500" : percent < 40 ? "bg-amber-500" : "bg-emerald-500";
+              return (
+                <li key={test.testId} className="rounded-md border border-slate-800 bg-slate-900 p-2.5 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-200">{test.label}</span>
+                    <span className={percent === 0 ? "text-red-400" : percent < 40 ? "text-amber-400" : "text-emerald-400"}>
+                      {test.passedAtDefaultParameters ? `${percent}% margin` : "✕ Not passed"}
+                    </span>
+                  </div>
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+                    <div className={`h-full rounded-full ${barColor}`} style={{ width: `${percent}%` }} />
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}

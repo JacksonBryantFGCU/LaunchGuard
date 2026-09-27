@@ -158,6 +158,10 @@ const spikeProfile: StressProfile = {
   category: "spike",
 };
 
+function run(testId: string, parameters: Record<string, number>, marginRatio: number) {
+  return { testId, parameters, requirementResults: [{ marginRatio }] };
+}
+
 test("a scenario with no Stress Lab scores 0/0 resilience, never lowering the max", () => {
   const result = evaluateResilience([], []);
   assert.equal(result.resilienceScore, 0);
@@ -165,47 +169,60 @@ test("a scenario with no Stress Lab scores 0/0 resilience, never lowering the ma
   assert.deepEqual(result.resilienceTestResults, []);
 });
 
-test("passing the only test at its default parameters earns full resilience credit", () => {
-  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true }]);
+test("passing the only test at its default parameters with full margin earns full resilience credit", () => {
+  const result = evaluateResilience([loadProfile], [run("sustained-load", { requestsPerMinute: 800 }, 1)]);
   assert.equal(result.resilienceScore, 8);
+  assert.equal(result.resilienceTestResults[0]?.marginScore, 1);
   assert.equal(result.resilienceTestResults[0]?.passedAtDefaultParameters, true);
 });
 
+test("a comfortable margin scores higher than a thin one, even though both technically pass", () => {
+  const thin = evaluateResilience([loadProfile], [run("sustained-load", { requestsPerMinute: 800 }, 0.2)]);
+  const comfortable = evaluateResilience([loadProfile], [run("sustained-load", { requestsPerMinute: 800 }, 0.9)]);
+  assert.equal(thin.resilienceScore, 1.6); // 8 * 0.2
+  assert.equal(comfortable.resilienceScore, 7.2); // 8 * 0.9
+  assert.ok(comfortable.resilienceScore > thin.resilienceScore);
+});
+
 test("a run with an omitted parameter still counts as default (the engine fills it in the same way)", () => {
-  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: {}, passed: true }]);
+  const result = evaluateResilience([loadProfile], [run("sustained-load", {}, 1)]);
   assert.equal(result.resilienceScore, 8);
 });
 
-test("passing only after weakening the test's parameters earns no credit", () => {
-  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 100 }, passed: true }]);
+test("passing only after weakening the test's parameters earns no credit, regardless of the margin it reports", () => {
+  const result = evaluateResilience([loadProfile], [run("sustained-load", { requestsPerMinute: 100 }, 1)]);
   assert.equal(result.resilienceScore, 0);
   assert.equal(result.resilienceTestResults[0]?.passedAtDefaultParameters, false);
 });
 
-test("a failed run at default parameters earns no credit", () => {
-  const result = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: false }]);
+test("a violated run (marginRatio 0) at default parameters earns no credit", () => {
+  const result = evaluateResilience([loadProfile], [run("sustained-load", { requestsPerMinute: 800 }, 0)]);
   assert.equal(result.resilienceScore, 0);
+  assert.equal(result.resilienceTestResults[0]?.passedAtDefaultParameters, false);
 });
 
 test("resilience score is a fair share across every test the scenario offers", () => {
-  const result = evaluateResilience(
-    [loadProfile, spikeProfile],
-    [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true }],
-  );
-  assert.equal(result.resilienceScore, 4);
+  const result = evaluateResilience([loadProfile, spikeProfile], [run("sustained-load", { requestsPerMinute: 800 }, 1)]);
+  assert.equal(result.resilienceScore, 4); // sustained-load's full 4/4 share, traffic-spike's 0/4
   assert.equal(result.resilienceTestResults.find((r) => r.testId === "sustained-load")?.passedAtDefaultParameters, true);
   assert.equal(result.resilienceTestResults.find((r) => r.testId === "traffic-spike")?.passedAtDefaultParameters, false);
 });
 
-test("only the most recent-looking passing run matters, not a mix of a weak pass and a strong pass - any qualifying run is enough", () => {
+test("across multiple qualifying runs, the best margin counts", () => {
   const result = evaluateResilience(
     [loadProfile],
-    [
-      { testId: "sustained-load", parameters: { requestsPerMinute: 100 }, passed: true },
-      { testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true },
-    ],
+    [run("sustained-load", { requestsPerMinute: 800 }, 0.3), run("sustained-load", { requestsPerMinute: 800 }, 0.9)],
   );
-  assert.equal(result.resilienceScore, 8);
+  assert.equal(result.resilienceTestResults[0]?.marginScore, 0.9);
+  assert.equal(result.resilienceScore, 7.2);
+});
+
+test("a run's own margin is its worst requirement, not its best - one thin dimension caps the whole run", () => {
+  const result = evaluateResilience(
+    [loadProfile],
+    [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, requirementResults: [{ marginRatio: 0.9 }, { marginRatio: 0.1 }] }],
+  );
+  assert.equal(result.resilienceTestResults[0]?.marginScore, 0.1);
 });
 
 test("combineScenarioEvaluation sums both halves into totalScore/maxTotalScore", () => {
@@ -219,7 +236,7 @@ test("combineScenarioEvaluation sums both halves into totalScore/maxTotalScore",
     }),
     scenario,
   );
-  const resilience = evaluateResilience([loadProfile], [{ testId: "sustained-load", parameters: { requestsPerMinute: 800 }, passed: true }]);
+  const resilience = evaluateResilience([loadProfile], [run("sustained-load", { requestsPerMinute: 800 }, 1)]);
   const combined = combineScenarioEvaluation(written, resilience);
   assert.equal(combined.totalScore, 16 + 8);
   assert.equal(combined.maxTotalScore, 16 + 8);

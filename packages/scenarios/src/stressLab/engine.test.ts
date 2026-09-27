@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { simulateArchitecture, type StressLabSimulationInput } from "./engine.js";
+import { simulateArchitecture, marginBelowTarget, marginAboveTarget, type StressLabSimulationInput } from "./engine.js";
 
 // Two services (checkout, inventory) sharing one fixed-capacity database -
 // the same shape as the Black Friday Capacity Surge architecture, kept
@@ -178,4 +178,57 @@ test("a saturated database bottleneck carries a causal chain describing what was
   const result = simulateArchitecture(baseInput);
   const dbBottleneck = result.bottlenecks.find((b) => b.targetId === "postgres");
   assert.ok(dbBottleneck!.causalChain.length > 0);
+});
+
+// --- margin (spec: continuous headroom, not just met/at_risk/violated) --
+
+test("marginBelowTarget is 0 right at the target and 1 with no load at all", () => {
+  assert.equal(marginBelowTarget(800, 800), 0);
+  assert.equal(marginBelowTarget(0, 800), 1);
+});
+
+test("marginBelowTarget scales linearly with distance below target and clamps past it", () => {
+  assert.equal(marginBelowTarget(400, 800), 0.5);
+  assert.equal(marginBelowTarget(1600, 800), 0); // past target, clamped, never negative
+});
+
+test("marginAboveTarget is 0 at target and 1 at the ceiling", () => {
+  assert.equal(marginAboveTarget(99.95, 99.95, 100), 0);
+  assert.equal(marginAboveTarget(100, 99.95, 100), 1);
+});
+
+test("marginAboveTarget clamps below target to 0, never negative", () => {
+  assert.equal(marginAboveTarget(99.9, 99.95, 100), 0);
+});
+
+test("a violated requirement always carries marginRatio 0, regardless of which metric caused it", () => {
+  const result = simulateArchitecture(baseInput);
+  for (const r of result.requirementResults) {
+    if (r.status === "violated") assert.equal(r.marginRatio, 0);
+  }
+});
+
+test("a comfortably-passing run scores meaningfully higher margin than a barely-passing one", () => {
+  const comfortable = simulateArchitecture({
+    ...baseInput,
+    modifications: [
+      { kind: "add-component", id: "m1", componentType: "connection-pooler", targetEdgeId: "checkout-service-postgres", config: { maxBackendConnections: 170 } },
+      { kind: "add-component", id: "m2", componentType: "connection-pooler", targetEdgeId: "inventory-service-postgres", config: { maxBackendConnections: 170 } },
+    ],
+  });
+  const barelyPassing = simulateArchitecture({
+    ...baseInput,
+    modifications: [
+      { kind: "add-component", id: "m1", componentType: "connection-pooler", targetEdgeId: "checkout-service-postgres", config: { maxBackendConnections: 220 } },
+      { kind: "add-component", id: "m2", componentType: "connection-pooler", targetEdgeId: "inventory-service-postgres", config: { maxBackendConnections: 220 } },
+    ],
+  });
+  const comfortableLatency = comfortable.requirementResults.find((r) => r.requirementId === "req-latency")!;
+  const barelyPassingLatency = barelyPassing.requirementResults.find((r) => r.requirementId === "req-latency")!;
+  assert.notEqual(comfortableLatency.status, "violated");
+  assert.notEqual(barelyPassingLatency.status, "violated");
+  // The whole point: barelyPassing's "at_risk" and comfortable's "met" would
+  // have scored identically under the old binary pass/fail - margin tells
+  // them apart.
+  assert.ok(comfortableLatency.marginRatio > barelyPassingLatency.marginRatio);
 });
