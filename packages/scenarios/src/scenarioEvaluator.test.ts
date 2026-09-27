@@ -201,6 +201,18 @@ test("a violated run (marginRatio 0) at default parameters earns no credit", () 
   assert.equal(result.resilienceTestResults[0]?.passedAtDefaultParameters, false);
 });
 
+test("a run saved before marginRatio existed (missing on its requirement results) never produces NaN/null - it's treated as 0 margin, not a crash", () => {
+  const legacyRun = {
+    testId: "sustained-load",
+    parameters: { requestsPerMinute: 800 },
+    requirementResults: [{}, {}] as { marginRatio: number }[], // marginRatio absent, as old stored rows are
+  };
+  const result = evaluateResilience([loadProfile], [legacyRun]);
+  assert.equal(result.resilienceScore, 0);
+  assert.equal(Number.isFinite(result.resilienceScore), true);
+  assert.equal(result.resilienceTestResults[0]?.marginScore, 0);
+});
+
 test("resilience score is a fair share across every test the scenario offers", () => {
   const result = evaluateResilience([loadProfile, spikeProfile], [run("sustained-load", { requestsPerMinute: 800 }, 1)]);
   assert.equal(result.resilienceScore, 4); // sustained-load's full 4/4 share, traffic-spike's 0/4

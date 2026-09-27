@@ -108,10 +108,18 @@ function ranAtDefaultParameters(profile: StressProfile, parameters: StressParame
   return profile.parameters.every((p) => (parameters[p.id] ?? p.defaultValue) === p.defaultValue);
 }
 
-/** The worst margin across a run's own requirements - one violated or thin requirement caps the whole run's credit, same principle as "passed" requiring every requirement to hold. */
+/**
+ * The worst margin across a run's own requirements - one violated or thin
+ * requirement caps the whole run's credit, same principle as "passed"
+ * requiring every requirement to hold. Defaults a missing/non-finite
+ * marginRatio to 0 (pessimistic, never a free pass) rather than letting it
+ * propagate as NaN - a real gap for runs saved before marginRatio existed
+ * on stress-lab requirement results, and NaN silently serializes to null
+ * in storage, which then fails strict schema validation on read.
+ */
 function runMargin(run: StressRunOutcome): number {
   if (run.requirementResults.length === 0) return 0;
-  return Math.min(...run.requirementResults.map((r) => r.marginRatio));
+  return Math.min(...run.requirementResults.map((r) => (Number.isFinite(r.marginRatio) ? r.marginRatio : 0)));
 }
 
 /**
