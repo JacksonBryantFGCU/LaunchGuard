@@ -7,6 +7,14 @@ import { SignUpPage } from "../pages/SignUpPage.js";
 import { ScenarioLibraryPage } from "../pages/ScenarioLibraryPage.js";
 import { ReviewHistoryPage } from "../pages/ReviewHistoryPage.js";
 import { LeaderboardPage } from "../pages/LeaderboardPage.js";
+import { SystemsHomePage } from "../pages/SystemsHomePage.js";
+import { SystemWorkspaceLayout } from "../pages/SystemWorkspaceLayout.js";
+import { SystemOverviewPage } from "../pages/SystemOverviewPage.js";
+import { SystemArchitecturePage } from "../pages/SystemArchitecturePage.js";
+import { SystemRequirementsPage } from "../pages/SystemRequirementsPage.js";
+import { SystemScenariosPage } from "../pages/SystemScenariosPage.js";
+import { SystemSimulationsPage } from "../pages/SystemSimulationsPage.js";
+import { SystemFindingsPage } from "../pages/SystemFindingsPage.js";
 import { ArchitectureReviewLayout } from "../pages/ArchitectureReviewLayout.js";
 import { ArchitectureReviewPage } from "../pages/ArchitectureReviewPage.js";
 import { ReviewSummaryPage } from "../pages/ReviewSummaryPage.js";
@@ -31,7 +39,23 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <ScenarioLibraryPage /> },
+          { index: true, element: <SystemsHomePage /> },
+          {
+            path: "systems/:systemId",
+            element: <SystemWorkspaceLayout />,
+            children: [
+              { index: true, element: <SystemOverviewPage /> },
+              { path: "architecture", element: <SystemArchitecturePage /> },
+              { path: "requirements", element: <SystemRequirementsPage /> },
+              { path: "scenarios", element: <SystemScenariosPage /> },
+              { path: "simulations", element: <SystemSimulationsPage /> },
+              { path: "findings", element: <SystemFindingsPage /> },
+            ],
+          },
+          // Legacy interview/training flow - no longer linked from primary
+          // navigation (Systems is now the primary landing), kept working
+          // for old links/history entries. See Phase 1 Systems report.
+          { path: "practice", element: <ScenarioLibraryPage /> },
           { path: "history", element: <ReviewHistoryPage /> },
           { path: "leaderboard", element: <LeaderboardPage /> },
           {

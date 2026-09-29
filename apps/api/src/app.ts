@@ -21,6 +21,9 @@ import type { LeaderboardRepository } from "./services/leaderboardRepository.js"
 import { practiceScenariosRouter } from "./routes/practiceScenarios.js";
 import { createPracticeScenarioAttemptsRouter } from "./routes/practiceScenarioAttempts.js";
 import { createLeaderboardRouter } from "./routes/leaderboard.js";
+import { createSystemsRouter } from "./routes/systems.js";
+import { createDefaultSystemRepository } from "./db/systemRepositoryFactory.js";
+import type { SystemRepository } from "./services/systemRepository.js";
 
 export interface CreateAppOverrides {
   // Test-only seam: replaces requireAuth so tests never depend on Clerk's
@@ -33,6 +36,8 @@ export interface CreateAppOverrides {
   practiceRepository?: PracticeScenarioRepository;
   // Test-only seam: same idea as `repository`, for leaderboard persistence.
   leaderboardRepository?: LeaderboardRepository;
+  // Test-only seam: same idea as `repository`, for system persistence.
+  systemRepository?: SystemRepository;
 }
 
 export function createApp(overrides: CreateAppOverrides = {}) {
@@ -41,6 +46,7 @@ export function createApp(overrides: CreateAppOverrides = {}) {
   const repository = overrides.repository ?? createDefaultReviewRepository();
   const practiceRepository = overrides.practiceRepository ?? createDefaultPracticeScenarioRepository();
   const leaderboardRepository = overrides.leaderboardRepository ?? createDefaultLeaderboardRepository();
+  const systemRepository = overrides.systemRepository ?? createDefaultSystemRepository();
 
   app.use(helmet());
   app.use(cors({ origin: env.WEB_ORIGIN }));
@@ -64,6 +70,7 @@ export function createApp(overrides: CreateAppOverrides = {}) {
   app.use("/api/reviews", requireAuth, createReviewsRouter(repository, practiceRepository));
   app.use("/api/voice", requireAuth, voiceRouter);
   app.use("/api/leaderboard", requireAuth, createLeaderboardRouter(leaderboardRepository));
+  app.use("/api/systems", requireAuth, createSystemsRouter(systemRepository));
 
   app.use(errorHandler);
 

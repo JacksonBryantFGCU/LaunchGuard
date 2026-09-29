@@ -12,12 +12,18 @@ export function Header() {
             Purgatory
           </Link>
           <Link to="/app" className="text-sm text-slate-400 hover:text-slate-100">
+            Systems
+          </Link>
+          {/* Legacy interview/training nav, demoted from primary position
+              (see Phase 1 Systems report) but not removed - old data must
+              stay reachable. */}
+          <Link to="/app/practice" className="text-sm text-slate-500 hover:text-slate-300">
             Practice
           </Link>
-          <Link to="/app/history" className="text-sm text-slate-400 hover:text-slate-100">
+          <Link to="/app/history" className="text-sm text-slate-500 hover:text-slate-300">
             History
           </Link>
-          <Link to="/app/leaderboard" className="text-sm text-slate-400 hover:text-slate-100">
+          <Link to="/app/leaderboard" className="text-sm text-slate-500 hover:text-slate-300">
             Leaderboard
           </Link>
         </div>

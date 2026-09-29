@@ -4,6 +4,7 @@ import { createRequireAuth } from "./middleware/auth.js";
 import { InMemoryReviewRepository, type ReviewRepository } from "./services/reviewRepository.js";
 import { InMemoryPracticeScenarioRepository, type PracticeScenarioRepository } from "./services/practiceScenarioRepository.js";
 import { InMemoryLeaderboardRepository, type LeaderboardRepository } from "./services/leaderboardRepository.js";
+import { InMemorySystemRepository, type SystemRepository } from "./services/systemRepository.js";
 
 export const TEST_USER_ID = "user_test_default";
 
@@ -18,6 +19,8 @@ export interface WithTestServerOptions {
   practiceRepository?: PracticeScenarioRepository;
   // Same idea as `repository`, for leaderboard persistence.
   leaderboardRepository?: LeaderboardRepository;
+  // Same idea as `repository`, for system persistence.
+  systemRepository?: SystemRepository;
 }
 
 export async function withTestServer<T>(
@@ -28,11 +31,13 @@ export async function withTestServer<T>(
   const repository = options.repository ?? new InMemoryReviewRepository();
   const practiceRepository = options.practiceRepository ?? new InMemoryPracticeScenarioRepository();
   const leaderboardRepository = options.leaderboardRepository ?? new InMemoryLeaderboardRepository();
+  const systemRepository = options.systemRepository ?? new InMemorySystemRepository();
   const app = createApp({
     requireAuth: createRequireAuth(() => ({ userId })),
     repository,
     practiceRepository,
     leaderboardRepository,
+    systemRepository,
   });
   const server: Server = await new Promise((resolve) => {
     const s = app.listen(0, () => resolve(s));
